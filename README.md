@@ -1,5 +1,6 @@
-# Flask server setup
-## Pre-requisites: Python
+# Spring
+### Flask server setup
+#### Pre-requisites: Python
 ```
     cd spring-api
 ```
@@ -20,8 +21,8 @@
 ```
 *(The localhost server may not be detected by Flutter, use your IP address as the address in that case)*
 
-# Firebase setup
-## Pre-requisites: Node, NPM
+### Firebase setup
+#### Pre-requisites: Node, NPM
 ###### For Firebase CLI either follow this guide: https://firebase.google.com/docs/cli?hl=en&authuser=0#install_the_firebase_cli
 ###### or do this:
 
@@ -32,8 +33,8 @@
     firebase login
 ```
 
-# Flutter setup
-## Pre-requisites: Android Emulator
+### Flutter setup
+#### Pre-requisites: Android Emulator
 ###### Install flutter using this guide: https://docs.flutter.dev/get-started/install/windows/mobile
 ```
     cd ..
