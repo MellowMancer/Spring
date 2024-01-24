@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "610922772594",
+    "project_id": "spring-a-ling",
+    "storage_bucket": "spring-a-ling.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:610922772594:android:7e41566e1637574bf82aeb",
+        "android_client_info": {
+          "package_name": "com.example.spring"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDZVb13K7gF5O4EtRhoCdSr4E9mmiPiMJI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
