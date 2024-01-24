@@ -1,6 +1,10 @@
 # Flask server setup
 ## Pre-requisites: Python
-```cd spring-api```
+```
+{
+    cd spring-api
+}
+```
 ```python venv .venv```
 ```.venv\Scripts\activate```
 ```pip install flask```
