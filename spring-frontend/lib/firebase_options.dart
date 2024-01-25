@@ -7,14 +7,13 @@ import 'package:flutter/foundation.dart'
 /// Default [FirebaseOptions] for use with your Firebase apps.
 ///
 /// Example:
-// / ```dart
-// / import 'firebase_options.dart';
-// / // ...
-// / await Firebase.initializeApp(
-// /   options: DefaultFirebaseOptions.currentPlatform,
-// / );
-// / ```
-
+/// ```dart
+/// import 'firebase_options.dart';
+/// // ...
+/// await Firebase.initializeApp(
+///   options: DefaultFirebaseOptions.currentPlatform,
+/// );
+/// ```
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
@@ -55,6 +54,7 @@ class DefaultFirebaseOptions {
     appId: '1:610922772594:android:7e41566e1637574bf82aeb',
     messagingSenderId: '610922772594',
     projectId: 'spring-a-ling',
+    databaseURL: 'https://spring-a-ling-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'spring-a-ling.appspot.com',
   );
 
@@ -63,8 +63,9 @@ class DefaultFirebaseOptions {
     appId: '1:610922772594:ios:55c3cdf512de7798f82aeb',
     messagingSenderId: '610922772594',
     projectId: 'spring-a-ling',
+    databaseURL: 'https://spring-a-ling-default-rtdb.asia-southeast1.firebasedatabase.app',
     storageBucket: 'spring-a-ling.appspot.com',
+    iosClientId: '610922772594-jhmupckdcogdaphq3653tgn6c4ar5krk.apps.googleusercontent.com',
     iosBundleId: 'com.example.spring',
   );
 }
-
