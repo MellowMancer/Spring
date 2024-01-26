@@ -39,7 +39,7 @@ class _HomeState extends State<Home> {
               TextField(
                 onChanged: (value) {
                   setState(() {
-                    url = 'http://192.168.29.119:4000/api?query=${value.toString()}';
+                    url = 'http://127.0.0.1:5000/api?query=${value.toString()}';
                   });
                 },
                 decoration: const InputDecoration(
