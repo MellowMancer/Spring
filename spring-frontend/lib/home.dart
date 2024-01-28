@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:spring/function.dart';
 
 class Home extends StatefulWidget {
-  const Home({Key? key}) : super(key: key);
+  const Home({super.key});
 
   static const String routeName = '/home';
 
@@ -24,7 +24,7 @@ class _HomeState extends State<Home> {
       theme: isDarkMode ? ThemeData.dark() : ThemeData.light(),
       home: Scaffold(
         appBar: AppBar(
-          title: Text('Spring App'),
+          title: const Text('Spring App'),
         ),
         body: Padding(
           padding: const EdgeInsets.all(16),
@@ -33,12 +33,12 @@ class _HomeState extends State<Home> {
             children: [
               Text(
                 'Welcome to Spring',
-                style: Theme.of(context).textTheme.headline5,
+                style: Theme.of(context).textTheme.headlineSmall,
               ),
               const SizedBox(height: 16),
               Text(
                 'This is the home page',
-                style: Theme.of(context).textTheme.subtitle1,
+                style: Theme.of(context).textTheme.titleMedium,
               ),
               const SizedBox(height: 16),
               TextField(
@@ -47,7 +47,7 @@ class _HomeState extends State<Home> {
                     url = 'http://127.0.0.1:5000/api?query=${value.toString()}';
                   });
                 },
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   border: OutlineInputBorder(),
                   labelText: 'Enter Value',
                 ),
@@ -72,13 +72,13 @@ class _HomeState extends State<Home> {
               const SizedBox(height: 16),
               Text(
                 output,
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('Dark Mode'),
+                  const Text('Dark Mode'),
                   Switch(
                     value: isDarkMode,
                     onChanged: (value) {
@@ -96,7 +96,7 @@ class _HomeState extends State<Home> {
           onPressed: () {
             _showContactDialog(context);
           },
-          child: Icon(Icons.contact_mail),
+          child: const Icon(Icons.contact_mail),
         ),
       ),
     );
@@ -107,8 +107,8 @@ class _HomeState extends State<Home> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Contact Us'),
-          content: Column(
+          title: const Text('Contact Us'),
+          content: const Column(
             children: [
               ListTile(
                 title: Text('Rahul Deoghare'),
@@ -126,7 +126,7 @@ class _HomeState extends State<Home> {
               onPressed: () {
                 Navigator.of(context).pop();
               },
-              child: Text('Close'),
+              child: const Text('Close'),
             ),
           ],
         );

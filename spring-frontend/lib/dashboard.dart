@@ -1,28 +1,21 @@
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(MyApp());
-}
 
-class MyApp extends StatelessWidget {
+class Dashboard extends StatefulWidget {
+  const Dashboard({super.key});
+
+  static const String routeName = '/dashboard';
+
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'My Dashboard',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: Dashboard(),
-    );
-  }
+  State<Dashboard> createState() => _DashboardState();
 }
 
-class Dashboard extends StatelessWidget {
+class _DashboardState extends State<Dashboard> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('My Dashboard'),
+        title: const Text('My Dashboard'),
       ),
       body: Center(
         child: Column(
@@ -32,37 +25,37 @@ class Dashboard extends StatelessWidget {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SleepMonitoringScreen()),
+                  MaterialPageRoute(builder: (context) => const SleepMonitoringScreen()),
                 );
               },
-              child: Text('Sleep Monitoring'),
+              child: const Text('Sleep Monitoring'),
             ),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => MoodTrackingScreen()),
+                  MaterialPageRoute(builder: (context) => const MoodTrackingScreen()),
                 );
               },
-              child: Text('Mood Tracking'),
+              child: const Text('Mood Tracking'),
             ),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => GratitudeJournalingScreen()),
+                  MaterialPageRoute(builder: (context) => const GratitudeJournalingScreen()),
                 );
               },
-              child: Text('Gratitude Journaling'),
+              child: const Text('Gratitude Journaling'),
             ),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => DiaryScreen()),
+                  MaterialPageRoute(builder: (context) => const DiaryScreen()),
                 );
               },
-              child: Text('Diary'),
+              child: const Text('Diary'),
             ),
           ],
         ),
@@ -72,13 +65,15 @@ class Dashboard extends StatelessWidget {
 }
 
 class SleepMonitoringScreen extends StatelessWidget {
+  const SleepMonitoringScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Sleep Monitoring'),
+        title: const Text('Sleep Monitoring'),
       ),
-      body: Center(
+      body: const Center(
         child: Text('Sleep Monitoring Screen'),
       ),
     );
@@ -86,13 +81,15 @@ class SleepMonitoringScreen extends StatelessWidget {
 }
 
 class MoodTrackingScreen extends StatelessWidget {
+  const MoodTrackingScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Mood Tracking'),
+        title: const Text('Mood Tracking'),
       ),
-      body: Center(
+      body: const Center(
         child: Text('Mood Tracking Screen'),
       ),
     );
@@ -100,13 +97,15 @@ class MoodTrackingScreen extends StatelessWidget {
 }
 
 class GratitudeJournalingScreen extends StatelessWidget {
+  const GratitudeJournalingScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Gratitude Journaling'),
+        title: const Text('Gratitude Journaling'),
       ),
-      body: Center(
+      body: const Center(
         child: Text('Gratitude Journaling Screen'),
       ),
     );
@@ -114,13 +113,15 @@ class GratitudeJournalingScreen extends StatelessWidget {
 }
 
 class DiaryScreen extends StatelessWidget {
+  const DiaryScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Diary'),
+        title: const Text('Diary'),
       ),
-      body: Center(
+      body: const Center(
         child: Text('Diary Screen'),
       ),
     );
