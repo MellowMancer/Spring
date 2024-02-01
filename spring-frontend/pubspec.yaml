@@ -9,17 +9,19 @@ version: 1.0.0+1
 environment:
   sdk: '>=3.2.5 <4.0.0'
 
+dependency_overrides:
+  http: ^1.2.0
+
 dependencies:
-  google_fonts: ^2.2.0
-  firebase_auth: ^4.16.0
+  google_fonts: ^6.1.0
+  firebase_auth: ^4.17.2
   firebase_core: ^2.24.2
   flutter:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
   google_sign_in: ^6.2.1
-  http: ^0.13.6
-  requests: ^4.7.0
+  cloud_firestore: ^4.15.2
 
 dev_dependencies:
   flutter_test:
