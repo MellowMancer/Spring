@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, session, url_for
+from flask import Flask, render_template, request, redirect, session
 from flask_cors import CORS, cross_origin
 #for real-time database
 import pyrebase
@@ -10,12 +10,12 @@ app.config['CORS_HEADERS'] = 'Content-Type'
 config = {
   'apiKey': "AIzaSyCYe3ASqwa3ahPVYy8uXYfr9K0C6i2zRVw",
   'authDomain': "spring-a-ling.firebaseapp.com",
-  'databaseURL': "https://spring-a-ling-default-rtdb.asia-southeast1.firebasedatabase.app",
   'projectId': "spring-a-ling",
   'storageBucket': "spring-a-ling.appspot.com",
   'messagingSenderId': "610922772594",
   'appId': "1:610922772594:web:930b5f7f06a5cfebf82aeb",
-  'measurementId': "G-TG5WXBG85W"
+  'measurementId': "G-TG5WXBG85W",
+  'databaseURL': "https://spring-a-ling-default-rtdb.asia-southeast1.firebasedatabase.app",
 }
 
 firebase=pyrebase.initialize_app(config)
@@ -28,6 +28,8 @@ from firebase_admin import credentials, firestore
 cred = credentials.Certificate("spring-api\spring-a-ling-firebase-adminsdk-u83lc-a9820c5450.json")
 firebase_admin.initialize_app(cred)
 db=firestore.client()
+
+app.secret_key='secret'
 
 # #enter data
 # d1={'name':'Tanisha','age':20}
@@ -49,14 +51,11 @@ def index():
     if 'user' in session:
         return render_template('profile.html', user=session['user'])
     if request.method=='POST':
-        email=request.form['email']
-        password=request.form['password']
+        email=request.form.get('email')
+        password=request.form.get('password')
         try:
             user=auth.sign_in_with_email_and_password(email,password)
             session['user']=email
-            # return redirect(url_for('profile'))
-            print(user.uid)
-            print()
             return render_template('profile.html',user=session['user'], id=user['idToken'])
         except:
             return 'Please check your credentials'
@@ -68,15 +67,13 @@ def signup():
     # if 'user' in session:
     #     return render_template('profile.html', user=session['user'])
     if request.method=='POST':
-        email=request.form['email']
-        password=request.form['password']
+        email=request.form.get('email')
+        password=request.form.get('password')
         try:
             user=auth.create_user_with_email_and_password(email,password)
-            user=auth.sign_in_with_email_and_password(email,password)
             # auth.send_email_verification(user['idToken'])
+            user=auth.sign_in_with_email_and_password(email,password)
             session['user']=email
-            print(user.uid)
-            print()
             return render_template('profile.html', user=email)
         except:
             return 'The email already exists'
