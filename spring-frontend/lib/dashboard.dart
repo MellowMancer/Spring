@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 
-
 class Dashboard extends StatefulWidget {
-  const Dashboard({super.key});
+  const Dashboard({Key? key});
 
   static const String routeName = '/dashboard';
 
@@ -11,51 +10,135 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
+  bool _darkMode = false;
+
+  void _toggleDarkMode() {
+    setState(() {
+      _darkMode = !_darkMode;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Dashboard'),
+    return MaterialApp(
+      theme: _darkMode ? ThemeData.dark() : ThemeData.light(),
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text('My Dashboard'),
+          actions: [
+            Switch(
+              value: _darkMode,
+              onChanged: (value) {
+                _toggleDarkMode();
+              },
+            ),
+          ],
+        ),
+        body: Container(
+          padding: EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              _buildDashboardItem(
+                context,
+                'Sleep Monitoring',
+                'Track your sleep patterns',
+                Icons.bedtime,
+                () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const SleepMonitoringScreen()),
+                  );
+                },
+              ),
+              SizedBox(height: 20),
+              _buildDashboardItem(
+                context,
+                'Mood Tracking',
+                'Record your daily mood',
+                Icons.mood,
+                () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const MoodTrackingScreen()),
+                  );
+                },
+              ),
+              SizedBox(height: 20),
+              _buildDashboardItem(
+                context,
+                'Gratitude Journaling',
+                'Express gratitude daily',
+                Icons.sentiment_satisfied_alt,
+                () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const GratitudeJournalingScreen()),
+                  );
+                },
+              ),
+              SizedBox(height: 20),
+              _buildDashboardItem(
+                context,
+                'Diary',
+                'Write your thoughts',
+                Icons.book,
+                () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const DiaryScreen()),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+    );
+  }
+
+  Widget _buildDashboardItem(
+    BuildContext context,
+    String title,
+    String description,
+    IconData icon,
+    void Function() onTap,
+  ) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: EdgeInsets.all(20.0),
+        decoration: BoxDecoration(
+          color: Theme.of(context).cardColor,
+          borderRadius: BorderRadius.circular(10.0),
+        ),
+        child: Row(
           children: <Widget>[
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const SleepMonitoringScreen()),
-                );
-              },
-              child: const Text('Sleep Monitoring'),
+            Icon(
+              icon,
+              size: 40,
+              color: Theme.of(context).primaryColor,
             ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const MoodTrackingScreen()),
-                );
-              },
-              child: const Text('Mood Tracking'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const GratitudeJournalingScreen()),
-                );
-              },
-              child: const Text('Gratitude Journaling'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const DiaryScreen()),
-                );
-              },
-              child: const Text('Diary'),
+            SizedBox(width: 20),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 5),
+                Text(
+                  description,
+                  style: TextStyle(
+                    fontSize: 16,
+                  ),
+                ),
+              ],
             ),
           ],
         ),
@@ -65,7 +148,7 @@ class _DashboardState extends State<Dashboard> {
 }
 
 class SleepMonitoringScreen extends StatelessWidget {
-  const SleepMonitoringScreen({super.key});
+  const SleepMonitoringScreen({Key? key});
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +164,7 @@ class SleepMonitoringScreen extends StatelessWidget {
 }
 
 class MoodTrackingScreen extends StatelessWidget {
-  const MoodTrackingScreen({super.key});
+  const MoodTrackingScreen({Key? key});
 
   @override
   Widget build(BuildContext context) {
@@ -97,7 +180,7 @@ class MoodTrackingScreen extends StatelessWidget {
 }
 
 class GratitudeJournalingScreen extends StatelessWidget {
-  const GratitudeJournalingScreen({super.key});
+  const GratitudeJournalingScreen({Key? key});
 
   @override
   Widget build(BuildContext context) {
@@ -113,7 +196,7 @@ class GratitudeJournalingScreen extends StatelessWidget {
 }
 
 class DiaryScreen extends StatelessWidget {
-  const DiaryScreen({super.key});
+  const DiaryScreen({Key? key});
 
   @override
   Widget build(BuildContext context) {
@@ -126,4 +209,10 @@ class DiaryScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+void main() {
+  runApp(MaterialApp(
+    home: Dashboard(),
+  ));
 }
