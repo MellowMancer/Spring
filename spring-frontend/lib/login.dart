@@ -1,221 +1,98 @@
 import 'package:flutter/material.dart';
+import 'dashboard.dart';
 
-class Dashboard extends StatefulWidget {
-  const Dashboard({Key? key});
+class LoginForm extends StatefulWidget {
+  const LoginForm({Key? key}) : super(key: key);
 
-  static const String routeName = '/dashboard';
+  static const String routeName = '/login';
 
   @override
-  State<Dashboard> createState() => _DashboardState();
+  State<LoginForm> createState() => _LoginFormState();
 }
 
-class _DashboardState extends State<Dashboard> {
-  bool _darkMode = false;
-
-  void _toggleDarkMode() {
-    setState(() {
-      _darkMode = !_darkMode;
-    });
-  }
+class _LoginFormState extends State<LoginForm> {
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: _darkMode ? ThemeData.dark() : ThemeData.light(),
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('My Dashboard'),
-          actions: [
-            Switch(
-              value: _darkMode,
-              onChanged: (value) {
-                _toggleDarkMode();
-              },
-            ),
-          ],
-        ),
-        body: Container(
-          padding: EdgeInsets.all(20.0),
-          color: _darkMode ? Colors.black : Colors.white,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              _buildDashboardItem(
-                context,
-                'Sleep Monitoring',
-                'Track your sleep patterns',
-                Icons.bedtime,
-                () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const SleepMonitoringScreen()),
-                  );
-                },
-              ),
-              SizedBox(height: 20),
-              _buildDashboardItem(
-                context,
-                'Mood Tracking',
-                'Record your daily mood',
-                Icons.mood,
-                () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const MoodTrackingScreen()),
-                  );
-                },
-              ),
-              SizedBox(height: 20),
-              _buildDashboardItem(
-                context,
-                'Gratitude Journaling',
-                'Express gratitude daily',
-                Icons.sentiment_satisfied_alt,
-                () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const GratitudeJournalingScreen()),
-                  );
-                },
-              ),
-              SizedBox(height: 20),
-              _buildDashboardItem(
-                context,
-                'Diary',
-                'Write your thoughts',
-                Icons.book,
-                () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const DiaryScreen()),
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Login'),
       ),
-    );
-  }
-
-  Widget _buildDashboardItem(
-    BuildContext context,
-    String title,
-    String description,
-    IconData icon,
-    void Function() onTap,
-  ) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: EdgeInsets.all(20.0),
-        decoration: BoxDecoration(
-          color: _darkMode ? Colors.grey[900] : Colors.grey[200],
-          borderRadius: BorderRadius.circular(10.0),
-        ),
-        child: Row(
-          children: <Widget>[
-            Icon(
-              icon,
-              size: 40,
-              color: _darkMode ? Colors.white : Colors.black,
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch, // Align elements horizontally
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: TextField(
+              controller: _usernameController,
+              decoration: const InputDecoration(
+                labelText: 'Username',
+              ),
             ),
-            SizedBox(width: 20),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: _darkMode ? Colors.white : Colors.black,
-                  ),
-                ),
-                SizedBox(height: 5),
-                Text(
-                  description,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: _darkMode ? Colors.white70 : Colors.black87,
+          ),
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: TextField(
+              controller: _passwordController,
+              decoration: const InputDecoration(
+                labelText: 'Password',
+              ),
+              obscureText: true,
+            ),
+          ),
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    // Add your forgot password logic here
+                  },
+                  child: const Text(
+                    'Forgot Password?',
+                    style: TextStyle(color: Colors.blue),
                   ),
                 ),
               ],
             ),
-          ],
-        ),
+          ),
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const Dashboard()),
+                );
+              },
+              child: const Text('Login'),
+            ),
+          ),
+        ],
       ),
     );
   }
 }
 
-class SleepMonitoringScreen extends StatelessWidget {
-  const SleepMonitoringScreen({Key? key});
+// class Dashboard extends StatelessWidget {
+//   const Dashboard({Key? key}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Sleep Monitoring'),
-      ),
-      body: const Center(
-        child: Text('Sleep Monitoring Screen'),
-      ),
-    );
-  }
-}
-
-class MoodTrackingScreen extends StatelessWidget {
-  const MoodTrackingScreen({Key? key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Mood Tracking'),
-      ),
-      body: const Center(
-        child: Text('Mood Tracking Screen'),
-      ),
-    );
-  }
-}
-
-class GratitudeJournalingScreen extends StatelessWidget {
-  const GratitudeJournalingScreen({Key? key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Gratitude Journaling'),
-      ),
-      body: const Center(
-        child: Text('Gratitude Journaling Screen'),
-      ),
-    );
-  }
-}
-
-class DiaryScreen extends StatelessWidget {
-  const DiaryScreen({Key? key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Diary'),
-      ),
-      body: const Center(
-        child: Text('Diary Screen'),
-      ),
-    );
-  }
-}
-
-void main() {
-  runApp(MaterialApp(
-    home: Dashboard(),
-  ));
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Scaffold(
+//       appBar: AppBar(
+//         title: const Text('My Dashboard'),
+//       ),
+//       body: const Center(
+//         child: Text('Welcome to Dashboard!'),
+//       ),
+//     );
+//   }
+// }
