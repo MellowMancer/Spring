@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class Dashboard extends StatefulWidget {
-  const Dashboard({Key? key});
+  const Dashboard({super.key});
 
   static const String routeName = '/dashboard';
 
@@ -35,7 +35,7 @@ class _DashboardState extends State<Dashboard> {
           ],
         ),
         body: Container(
-          padding: EdgeInsets.all(20.0),
+          padding: const EdgeInsets.all(20.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisAlignment: MainAxisAlignment.center,
@@ -52,7 +52,7 @@ class _DashboardState extends State<Dashboard> {
                   );
                 },
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               _buildDashboardItem(
                 context,
                 'Mood Tracking',
@@ -65,7 +65,7 @@ class _DashboardState extends State<Dashboard> {
                   );
                 },
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               _buildDashboardItem(
                 context,
                 'Gratitude Journaling',
@@ -78,7 +78,7 @@ class _DashboardState extends State<Dashboard> {
                   );
                 },
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               _buildDashboardItem(
                 context,
                 'Diary',
@@ -108,7 +108,7 @@ class _DashboardState extends State<Dashboard> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: EdgeInsets.all(20.0),
+        padding: const EdgeInsets.all(20.0),
         decoration: BoxDecoration(
           color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(10.0),
@@ -120,21 +120,21 @@ class _DashboardState extends State<Dashboard> {
               size: 40,
               color: Theme.of(context).primaryColor,
             ),
-            SizedBox(width: 20),
+            const SizedBox(width: 20),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
                   title,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 5),
+                const SizedBox(height: 5),
                 Text(
                   description,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 16,
                   ),
                 ),
@@ -148,7 +148,7 @@ class _DashboardState extends State<Dashboard> {
 }
 
 class SleepMonitoringScreen extends StatelessWidget {
-  const SleepMonitoringScreen({Key? key});
+  const SleepMonitoringScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -164,7 +164,7 @@ class SleepMonitoringScreen extends StatelessWidget {
 }
 
 class MoodTrackingScreen extends StatelessWidget {
-  const MoodTrackingScreen({Key? key});
+  const MoodTrackingScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -180,7 +180,7 @@ class MoodTrackingScreen extends StatelessWidget {
 }
 
 class GratitudeJournalingScreen extends StatelessWidget {
-  const GratitudeJournalingScreen({Key? key});
+  const GratitudeJournalingScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -196,7 +196,7 @@ class GratitudeJournalingScreen extends StatelessWidget {
 }
 
 class DiaryScreen extends StatelessWidget {
-  const DiaryScreen({Key? key});
+  const DiaryScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -212,7 +212,7 @@ class DiaryScreen extends StatelessWidget {
 }
 
 void main() {
-  runApp(MaterialApp(
+  runApp(const MaterialApp(
     home: Dashboard(),
   ));
 }
