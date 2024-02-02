@@ -7,7 +7,7 @@ void main() {
 }
 
 class Dashboard extends StatefulWidget {
-  const Dashboard({super.key});
+  const Dashboard({Key? key});
 
   static const String routeName = '/dashboard';
 
@@ -41,7 +41,8 @@ class _DashboardState extends State<Dashboard> {
           ],
         ),
         body: Container(
-          padding: const EdgeInsets.all(20.0),
+          padding: EdgeInsets.all(20.0),
+          color: _darkMode ? Colors.grey[900] ?? Colors.black : Colors.white,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisAlignment: MainAxisAlignment.center,
@@ -58,7 +59,7 @@ class _DashboardState extends State<Dashboard> {
                   );
                 },
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20),
               _buildDashboardItem(
                 context,
                 'Mood Tracking',
@@ -71,7 +72,7 @@ class _DashboardState extends State<Dashboard> {
                   );
                 },
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20),
               _buildDashboardItem(
                 context,
                 'Gratitude Journaling',
@@ -84,7 +85,7 @@ class _DashboardState extends State<Dashboard> {
                   );
                 },
               ),
-              const SizedBox(height: 20),
+              SizedBox(height: 20),
               _buildDashboardItem(
                 context,
                 'Diary',
@@ -114,7 +115,7 @@ class _DashboardState extends State<Dashboard> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(20.0),
+        padding: EdgeInsets.all(20.0),
         decoration: BoxDecoration(
           color: _darkMode ? Colors.grey[800] ?? Colors.black : Colors.grey[200] ?? Colors.white,
           borderRadius: BorderRadius.circular(10.0),
@@ -133,22 +134,22 @@ class _DashboardState extends State<Dashboard> {
               size: 40,
               color: _darkMode ? Colors.white : Colors.black,
             ),
-            const SizedBox(width: 20),
+            SizedBox(width: 20),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 Text(
                   title,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
                     color: _darkMode ? Colors.white : Colors.black,
                   ),
                 ),
-                const SizedBox(height: 5),
+                SizedBox(height: 5),
                 Text(
                   description,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 16,
                     color: _darkMode ? Colors.white70 : Colors.black87,
                   ),
@@ -381,7 +382,7 @@ class _MoodTrackingScreenState extends State<MoodTrackingScreen> {
 }
 
 class GratitudeJournalingScreen extends StatelessWidget {
-  const GratitudeJournalingScreen({super.key});
+  const GratitudeJournalingScreen({Key? key});
 
   @override
   Widget build(BuildContext context) {
@@ -423,7 +424,7 @@ class GratitudeJournalingScreen extends StatelessWidget {
 }
 
 class DiaryScreen extends StatelessWidget {
-  const DiaryScreen({super.key});
+  const DiaryScreen({Key? key});
 
   @override
   Widget build(BuildContext context) {
