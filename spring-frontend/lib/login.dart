@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'dashboard.dart';
 
 class LoginForm extends StatefulWidget {
-  const LoginForm({Key? key}) : super(key: key);
+  const LoginForm({super.key});
 
-  static const String routeName = '/login';
+  static const String routeName = '/loginpage';
 
   @override
   State<LoginForm> createState() => _LoginFormState();
