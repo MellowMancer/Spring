@@ -24,7 +24,8 @@ dependencies:
   cloud_firestore: ^4.15.2
   requests: ^4.7.0
   firebase_storage: ^11.6.3
-  logger: ^2.0.2+1
+  logger: ^2.0.2+1'
+  intl: ^0.17.0
 
 dev_dependencies:
   flutter_test:
