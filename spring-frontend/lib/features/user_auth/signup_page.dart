@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:spring/features/user_auth/login_page.dart';
 import 'package:spring/features/widgets/form_container_widget.dart';
-import 'package:spring/features/pages/home_page.dart';
+import 'package:spring/features/screens/home_page.dart';
 import 'package:spring/features/widgets/bottom_navigation_bar.dart';
 // import 'package:spring/features/firebase_auth_implementation/firebase_auth_services.dart';
 import 'package:logger/logger.dart';
@@ -88,7 +88,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
     // Send a POST request to the Flask signup endpoint
     final response = await http.post(
-      Uri.parse('http://192.168.29.128:4000/signup'),
+      Uri.parse('http://10.0.2.2:5000/signup'),
       body: {
         'name': name,
         'displayName': displayName,
@@ -110,7 +110,7 @@ class _SignUpPageState extends State<SignUpPage> {
             content: SingleChildScrollView(
               child: ListBody(
                 children: <Widget>[
-                  Text(errorMessage),
+                  Text("Email already exists"),
                 ],
               ),
             ),
@@ -131,109 +131,127 @@ class _SignUpPageState extends State<SignUpPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Signup',
-            style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: Colors.white)),
-        backgroundColor: Colors.blue,
-      ),
-      body: Center(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text('Sign Up',
-                        style: TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 30),
-                    FormContainerWidget(
-                        controller: nameController,
-                        hintText: "Name",
-                        isPasswordField: false,
-                        validator: _validateName),
-                    const SizedBox(height: 15),
-                    FormContainerWidget(
-                        controller: displayNameController,
-                        hintText: "Display Name",
-                        isPasswordField: false,
-                        validator: _validateDisplayName),
-                    const SizedBox(height: 15),
-                    FormContainerWidget(
-                        controller: emailController,
-                        hintText: "Email",
-                        isPasswordField: false,
-                        validator: _validateEmail),
-                    const SizedBox(height: 15),
-                    FormContainerWidget(
-                        controller: passwordController,
-                        hintText: "Password",
-                        isPasswordField: true,
-                        validator: _validatePassword),
-                    const SizedBox(height: 15),
-                    FormContainerWidget(
-                        controller: confirmPasswordController,
-                        hintText: "Confirm Password",
-                        isPasswordField: true,
-                        validator: _validateConfirmPassword),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
+    // final colorScheme = Theme.of(context).colorScheme.copyWith(
+    //       primary: Color.fromARGB(255, 28, 76, 138), // Change the primary color
+    //       secondary: Color.fromARGB(255, 39, 21, 169),
+    //       tertiary: const Color.fromARGB(255, 12, 66, 172),
+    //     );
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return MaterialApp(
+        theme: ThemeData.light(),
+        home: Scaffold(
+          appBar: AppBar(
+            title: const Text('Spring Up Your Health!',
+                style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white)),
+            backgroundColor: colorScheme.primary,
+          ),
+          body: Center(
+            child: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const LoginPage()),
-                              (Route<dynamic> route) => false,
-                            );
-                          },
-                          child: const Text(
-                            'Already have an account?',
-                            style: TextStyle(color: Colors.blue),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            'Sign Up',
+                            style: TextStyle(
+                              fontSize: 40,
+                              fontWeight: FontWeight.bold,
+                              color: colorScheme.primary,
+                            ),
                           ),
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 10),
-                    ElevatedButton(
-                      onPressed: () async {
-                        if (_formKey.currentState!.validate()) {
-                          // All fields are valid, proceed with signUp
-                          bool isValid = await signUp();
-                          if (isValid) {
-                            // ignore: use_build_context_synchronously
-                            Navigator.pushAndRemoveUntil(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => const BottomNavBar()),
-                              (Route<dynamic> route) => false,
-                            );
-                          }
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        backgroundColor: Colors.blue,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                        const SizedBox(height: 30),
+                        FormContainerWidget(
+                            controller: nameController,
+                            hintText: "Name",
+                            isPasswordField: false,
+                            validator: _validateName),
+                        const SizedBox(height: 15),
+                        FormContainerWidget(
+                            controller: displayNameController,
+                            hintText: "Display Name",
+                            isPasswordField: false,
+                            validator: _validateDisplayName),
+                        const SizedBox(height: 15),
+                        FormContainerWidget(
+                            controller: emailController,
+                            hintText: "Email",
+                            isPasswordField: false,
+                            validator: _validateEmail),
+                        const SizedBox(height: 15),
+                        FormContainerWidget(
+                            controller: passwordController,
+                            hintText: "Password",
+                            isPasswordField: true,
+                            validator: _validatePassword),
+                        const SizedBox(height: 15),
+                        FormContainerWidget(
+                            controller: confirmPasswordController,
+                            hintText: "Confirm Password",
+                            isPasswordField: true,
+                            validator: _validateConfirmPassword),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => LoginPage()),
+                                  (Route<dynamic> route) => false,
+                                );
+                              },
+                              child: Text(
+                                'Already have an account?',
+                                style: TextStyle(color: colorScheme.primary),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                      child: const Text('Sign Up',
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold)),
-                    ),
-                  ]),
+                        const SizedBox(height: 10),
+                        ElevatedButton(
+                          onPressed: () async {
+                            if (_formKey.currentState!.validate()) {
+                              // All fields are valid, proceed with signUp
+                              bool isValid = await signUp();
+                              if (isValid) {
+                                // ignore: use_build_context_synchronously
+                                Navigator.pushAndRemoveUntil(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          const BottomNavBar()),
+                                  (Route<dynamic> route) => false,
+                                );
+                              }
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            foregroundColor: Colors.white,
+                            backgroundColor: colorScheme.primary,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                          child: const Text('Sign Up',
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold)),
+                        ),
+                      ]),
+                ),
+              ),
             ),
           ),
-        ),
-      ),
-    );
+        ));
   }
 }

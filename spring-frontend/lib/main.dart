@@ -2,7 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:spring/features/app/splashscreen/splashscreen.dart';
 import 'package:spring/features/user_auth/login_page.dart';
-import 'package:spring/features/pages/home_page.dart';
+import 'package:spring/features/screens/home_page.dart';
 import 'package:spring/features/user_auth/signup_page.dart';
 
 // import 'src/app.dart';
@@ -37,18 +37,24 @@ Future<void> main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key, required this.settingsController});
+  MyApp({super.key, required this.settingsController});
 
   final SettingsController settingsController;
+  final ColorScheme colorScheme = ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 132, 0, 255));
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+
         routes: {
           '/login': (context) => LoginPage(),
           '/home': (context) => HomePage(),
           '/signup': (context) => SignUpPage(),
         },
+
+        theme: ThemeData.from(colorScheme: colorScheme),
+        
+
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
         // home: LoginForm(),

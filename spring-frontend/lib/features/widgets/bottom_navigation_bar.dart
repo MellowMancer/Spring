@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:spring/features/pages/home_page.dart';
-import 'package:spring/features/pages/pet_page.dart';
-import 'package:spring/features/pages/profile_page.dart';
-import 'package:spring/features/pages/trivia_page.dart';
+import 'package:spring/features/screens/home_page.dart';
+import 'package:spring/features/screens/pet_page.dart';
+import 'package:spring/features/screens/profile_page.dart';
+import 'package:spring/features/screens/trivia_page.dart';
 
 class BottomNavBar extends StatefulWidget {
   const BottomNavBar({super.key});

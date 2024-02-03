@@ -25,7 +25,7 @@ auth=firebase.auth()
 import firebase_admin
 from firebase_admin import credentials, firestore
 
-cred = credentials.Certificate("spring-a-ling-firebase-adminsdk-u83lc-a9820c5450.json")
+cred = credentials.Certificate("spring-api\spring-a-ling-firebase-adminsdk-u83lc-a9820c5450.json")
 firebase_admin.initialize_app(cred)
 db=firestore.client()
 
@@ -52,6 +52,7 @@ def returnascii():
 def signup():
     n=request.args.get('next')
     if request.method=='POST':
+        print(request.form)
         displayName=request.form['displayName']
         name=request.form['name']
         email=request.form['email']
@@ -66,19 +67,40 @@ def signup():
             session['user_id']=user['localId']
 
 
-            ref=db.collection('users').document(user['localId'])
-            ref.set({'id':user['localId'],'name':name,'email':email,})
+            # ref=db.collection('users').document(user['localId'])
+            # ref.set({'id':user['localId'],'name':name,'email':email,})
 
             return jsonify({'message': 'Signup successful'}), 200
         except Exception as e:
             return jsonify({'error': str(e)}), 400
-    return jsonify({'message': 'Signup successful'}), 200            
+    return jsonify({'message': 'Signup successful'}), 200      
+
+@app.route('/login', methods=['GET','POST'])
+@cross_origin()
+def login():
+    n=request.args.get('next')
+    # print(n)
+    if 'user' in session:
+        return jsonify({'message': 'Already logged in'}), 200
+    if request.method=='POST':
+        email=request.form['email']
+        password=request.form['password']
+        try:
+            user=auth.sign_in_with_email_and_password(email,password)
+            session['user']=email
+            session['user_id']=user['localId']
+            print(session)
+            
+            return jsonify({'message': 'Login successful'}), 200
+        except:
+            return jsonify({'error': 'Invalid credentials'}), 400
+    return jsonify({'message': 'Login successful'}), 200      
 
 
 if __name__ == '__main__':
     # app.run(debug=True)
-    host = '0.0.0.0'
-    port = 4000
+    host = '127.0.0.1'
+    port = 5000
     print(f"Starting Flask app. Host: {host}, Port: {port}")
     app.run(debug=True, host=host, port=port)
     print("Flask app has started.")
