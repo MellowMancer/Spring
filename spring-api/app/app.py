@@ -83,7 +83,7 @@ def login():
             # return render_template('profile.html',user=session['user'])
         except:
             return ('Username or password is incorrect')
-    return render_template('login.html')
+    return render_template('login.html', next=n)
 
 @app.route('/signup', methods=['GET','POST'])
 def signup():
@@ -109,7 +109,7 @@ def signup():
                 return redirect(url_for('profile'))
         except:
             return ('The email already exists')
-    return render_template('signup.html')
+    return render_template('signup.html', next=n)
 
 @app.route('/profile')
 @authenticate_user
@@ -126,7 +126,7 @@ def logout():
 @app.route('/assessment')
 @authenticate_user
 def assesment():
-    return render_template('assessment.html')
+    return render_template('assessments.html')
 
 if __name__=='__main__':
     app.run(debug=True)
