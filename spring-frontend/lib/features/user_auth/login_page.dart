@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:spring/features/user_auth/presentation/widgets/form_container_widget.dart';
-import 'package:spring/features/user_auth/presentation/pages/signup_page.dart';
-import 'package:spring/features/user_auth/presentation/pages/home_page.dart';
+import 'package:spring/features/widgets/form_container_widget.dart';
+import 'package:spring/features/user_auth/signup_page.dart';
+import 'package:spring/features/pages/home_page.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});

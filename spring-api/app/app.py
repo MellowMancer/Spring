@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, session, url_for
 from flask_cors import CORS, cross_origin
 from functools import wraps
+from flask import jsonify
 #for real-time database
 import pyrebase
 
@@ -60,6 +61,7 @@ def authenticate_user(f):
     return decorated_function
 
 @app.route('/login', methods=['GET','POST'])
+@cross_origin()
 def login():
     n=request.args.get('next')
     # print(n)
@@ -86,10 +88,12 @@ def login():
     return render_template('login.html')
 
 @app.route('/signup', methods=['GET','POST'])
+@cross_origin()
 def signup():
     n=request.args.get('next')
     print(n)
     if request.method=='POST':
+        displayName=request.form['displayName']
         name=request.form['name']
         email=request.form['email']
         password=request.form['password']
@@ -102,21 +106,24 @@ def signup():
             session['user_id']=user['localId']
             # ref=db.collection('users').document(user['localId'])
             # ref.set({'name':name,'email':email,'id':user['localId']})
-            if type(n)==str:
-                print('True')
-                return redirect(request.url_root+n)
-            else:
-                return redirect(url_for('profile'))
-        except:
-            return ('The email already exists')
-    return render_template('signup.html')
+            # if type(n)==str:
+            #     print('True')
+            #     return redirect(request.url_root+n)
+            # else:
+            #     return redirect(url_for('profile'))
+            return jsonify({'message': 'Signup successful'}), 200
+        except Exception as e:
+            return jsonify({'error': str(e)}), 400
+    return jsonify({'message': 'Signup successful'}), 200
 
 @app.route('/profile')
+@cross_origin()
 @authenticate_user
 def profile():
     return render_template('profile.html', user=session['user'])
 
 @app.route('/logout')
+@cross_origin()
 @authenticate_user
 def logout():
     session.clear()
@@ -124,6 +131,7 @@ def logout():
     return redirect('/login')
 
 @app.route('/assessment')
+@cross_origin()
 @authenticate_user
 def assesment():
     return render_template('assessment.html')
