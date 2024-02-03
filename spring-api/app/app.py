@@ -1,5 +1,6 @@
-from flask import Flask, render_template, request, redirect, session
+from flask import Flask, render_template, request, redirect, session, url_for
 from flask_cors import CORS, cross_origin
+from functools import wraps
 #for real-time database
 import pyrebase
 
@@ -45,51 +46,87 @@ app.secret_key='secret'
 #     print(doc.id)
 #     print(doc.to_dict())
 
+def authenticate_user(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'user' in session:
+            return f(*args, **kwargs)
+        n=request.url
+        n=n.split('/')
+        print(n)
+        print('Decorated function')
+        # return redirect(url_for('login', next=n[-1]))
+        return render_template('login.html', next=n[-1])
+    return decorated_function
+
 @app.route('/login', methods=['GET','POST'])
-@cross_origin()
-def index():
+def login():
+    n=request.args.get('next')
+    # print(n)
     if 'user' in session:
-        return render_template('profile.html', user=session['user'])
+        if type(n)==str:
+            return redirect(url_for(n))
+        return redirect(url_for('profile'))
     if request.method=='POST':
-        email=request.form.get('email')
-        password=request.form.get('password')
+        email=request.form['email']
+        password=request.form['password']
         try:
             user=auth.sign_in_with_email_and_password(email,password)
             session['user']=email
-            return render_template('profile.html',user=session['user'], id=user['idToken'])
+            session['user_id']=user['localId']
+            print(session)
+            if type(n)==str:
+                print('True')
+                return redirect(request.url_root+n)
+            else:
+                return redirect(url_for('profile'))
+            # return render_template('profile.html',user=session['user'])
         except:
-            return 'Please check your credentials'
-    return render_template('home.html')
+            return ('Username or password is incorrect')
+    return render_template('login.html')
 
 @app.route('/signup', methods=['GET','POST'])
-@cross_origin()
 def signup():
-    # if 'user' in session:
-    #     return render_template('profile.html', user=session['user'])
+    n=request.args.get('next')
+    print(n)
     if request.method=='POST':
-        email=request.form.get('email')
-        password=request.form.get('password')
+        name=request.form['name']
+        email=request.form['email']
+        password=request.form['password']
         try:
             user=auth.create_user_with_email_and_password(email,password)
-            # auth.send_email_verification(user['idToken'])
             user=auth.sign_in_with_email_and_password(email,password)
+            # auth.send_email_verification(user['idToken'])
+            user['displayName']=name
             session['user']=email
-            return render_template('profile.html', user=email)
+            session['user_id']=user['localId']
+            # ref=db.collection('users').document(user['localId'])
+            # ref.set({'name':name,'email':email,'id':user['localId']})
+            if type(n)==str:
+                print('True')
+                return redirect(request.url_root+n)
+            else:
+                return redirect(url_for('profile'))
         except:
-            return 'The email already exists'
+            return ('The email already exists')
     return render_template('signup.html')
 
 @app.route('/profile')
-@cross_origin()
+@authenticate_user
 def profile():
-    return render_template('profile.html')
+    return render_template('profile.html', user=session['user'])
 
 @app.route('/logout')
-@cross_origin()
+@authenticate_user
 def logout():
-    session.pop('user')
+    session.clear()
     # return redirect(url_for('index'))
     return redirect('/login')
+
+@app.route('/assessment')
+@authenticate_user
+def assesment():
+    return render_template('assessment.html')
 
 if __name__=='__main__':
     app.run(debug=True)
