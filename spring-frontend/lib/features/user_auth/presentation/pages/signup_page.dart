@@ -121,17 +121,14 @@ class _SignUpPageState extends State<SignUpPage> {
     final String password = passwordController.text;
     // final String confirmPassword = confirmPasswordController.text;
 
-    print("Im signing up");
-
     UserCredential? user =
         await _auth.createUserWithEmailAndPassword(email, password);
     if (user != null) {
-      // ignore: use_build_context_synchronously
       Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (context) => const HomePage()),
-                    (Route<dynamic> route) => false,
-                  );
+        context,
+        MaterialPageRoute(builder: (context) => const HomePage()),
+        (Route<dynamic> route) => false,
+      );
     } else {
       print('User creation failed');
     }

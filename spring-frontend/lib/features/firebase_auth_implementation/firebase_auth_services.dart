@@ -1,17 +1,17 @@
 import 'package:firebase_auth/firebase_auth.dart';
 
 class FirebaseAuthServices {
-  final FirebaseAuth _firebaseAuth;
+  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
 
-  FirebaseAuthServices() : _firebaseAuth = FirebaseAuth.instance {
-    _firebaseAuth.userChanges().listen((User? user) {
-      if (user == null) {
-        print('User is currently signed out.');
-      } else {
-        print('User is signed in!');
-      }
-    });
-  }
+  // FirebaseAuthServices() : _firebaseAuth = FirebaseAuth.instance {
+  //   _firebaseAuth.userChanges().listen((User? user) {
+  //     if (user == null) {
+  //       print('User is currently signed out.');
+  //     } else {
+  //       print('User is signed in!');
+  //     }
+  //   });
+  // }
 
   Future<UserCredential> signInWithEmailAndPassword(
       String email, String password) async {
