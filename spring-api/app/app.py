@@ -85,7 +85,7 @@ def login():
             # return render_template('profile.html',user=session['user'])
         except:
             return ('Username or password is incorrect')
-    return render_template('login.html')
+    return render_template('login.html', next=n)
 
 @app.route('/signup', methods=['GET','POST'])
 @cross_origin()
@@ -106,15 +106,14 @@ def signup():
             session['user_id']=user['localId']
             # ref=db.collection('users').document(user['localId'])
             # ref.set({'name':name,'email':email,'id':user['localId']})
-            # if type(n)==str:
-            #     print('True')
-            #     return redirect(request.url_root+n)
-            # else:
-            #     return redirect(url_for('profile'))
-            return jsonify({'message': 'Signup successful'}), 200
-        except Exception as e:
-            return jsonify({'error': str(e)}), 400
-    return jsonify({'message': 'Signup successful'}), 200
+            if type(n)==str:
+                print('True')
+                return redirect(request.url_root+n)
+            else:
+                return redirect(url_for('profile'))
+        except:
+            return ('The email already exists')
+    return render_template('signup.html', next=n)
 
 @app.route('/profile')
 @cross_origin()
@@ -134,7 +133,7 @@ def logout():
 @cross_origin()
 @authenticate_user
 def assesment():
-    return render_template('assessment.html')
+    return render_template('assessments.html')
 
 if __name__=='__main__':
     app.run(debug=True)
