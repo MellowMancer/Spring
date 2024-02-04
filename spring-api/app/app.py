@@ -64,7 +64,6 @@ def authenticate_user(f):
     return decorated_function
 
 @app.route('/login', methods=['GET','POST'])
-@cross_origin()
 def login():
     n=request.args.get('next')
 
@@ -92,6 +91,7 @@ def login():
                 session['idToken']=user['idToken']
                 ref=db.collection('users').document(user['localId'])
                 ref.set({'id':user['localId'], 'name':session['username'],'email':email})
+                print('saved')
                 if type(n)==str:
                     return redirect(request.url_root+n)
                 else:
@@ -101,18 +101,18 @@ def login():
     return render_template('login.html', next=n)
 
 @app.route('/signup', methods=['GET','POST'])
-@cross_origin()
 def signup():
     n=request.args.get('next')
     if request.method=='POST':
-        displayName=request.form['displayName']
         name=request.form['name']
         email=request.form['email']
         password=request.form['password']
         try:
             user=auth.create_user_with_email_and_password(email,password)
             auth.send_email_verification(user['idToken'])
+            # user=auth.sign_in_with_email_and_password(email,password)
             session['username']=name
+            # print(user)
             if type(n)==str:
                 return "Email not verified. Please verify your email to <a href='/login?next="+n+"'>login</a>."
             else:
@@ -121,25 +121,6 @@ def signup():
         except:
             return 'The email already exists'
     return render_template('signup.html', next=n)
-
-<<<<<<< HEAD
-=======
-@app.route('/profile')
-@cross_origin()
-@authenticate_user
-def profile():
-    return render_template('profile.html', user=session['user'])
-
->>>>>>> 3972b8e848a981889ff1548946f96d5ffbddb70f
-@app.route('/logout')
-@cross_origin()
-@authenticate_user
-def logout():
-    print('logout')
-    a=auth.get_account_info(session['idToken'])
-    print(a)
-    session.clear()
-    return redirect('/login')
 
 @app.route('/forgot', methods=['GET','POST'])
 def forgot_password():
@@ -150,6 +131,7 @@ def forgot_password():
     else:
         return 'You are already logged in'
 
+
 @app.route('/profile')
 @authenticate_user
 def profile():
@@ -157,29 +139,19 @@ def profile():
     data=data.to_dict()
     print(data)
     return render_template('profile.html', name=data['name'], email=data['email'])
+    # return render_template('profile.html', name=data['name'], email=data['email'])
 
-@app.route('/edit-profile', methods=['GET','POST'])
+@app.route('/logout')
 @authenticate_user
-def editProfile():
-    name=request.form['name']
-    email=request.form['email']
-    ref=db.collection('users').document(session['localId'])
-    ref.update({'name':name, 'email':email})
-    return {'name':name, 'email':email}
-
-@app.route('/delete-user', methods=['GET','POST'])
-@authenticate_user
-def deleteUser():
-    auth.delete_user(session['idToken'])
+def logout():
+    print('logout')
     a=auth.get_account_info(session['idToken'])
-    print('delete')
     print(a)
-    # ref=db.collection('users').document(session['localId']).delete()
-    # session.clear()
-    return redirect(url_for('login'))   
+    session.clear()
+    # return redirect(url_for('index'))
+    return redirect('/login')
 
 @app.route('/assessment')
-@cross_origin()
 @authenticate_user
 def assesment():
     return render_template('assessments.html')
