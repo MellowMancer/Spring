@@ -49,79 +49,120 @@ app.secret_key='secret'
 def authenticate_user(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if 'user' in session:
+        try:
+            a=auth.get_account_info(session['idToken'])
             return f(*args, **kwargs)
+        except:
+            if 'user' in session:
+                ref=db.collection('users').document(session['localId']).delete()
+                session.clear()
+
         n=request.url
         n=n.split('/')
-        print(n)
-        print('Decorated function')
-        # return redirect(url_for('login', next=n[-1]))
         return render_template('login.html', next=n[-1])
     return decorated_function
 
 @app.route('/login', methods=['GET','POST'])
 def login():
     n=request.args.get('next')
-    # print(n)
+
     if 'user' in session:
         if type(n)==str:
-            return redirect(url_for(n))
+            return redirect(request.url_root+n)
         return redirect(url_for('profile'))
+    
     if request.method=='POST':
         email=request.form['email']
         password=request.form['password']
         try:
             user=auth.sign_in_with_email_and_password(email,password)
-            session['user']=email
-            session['user_id']=user['localId']
-            print(session)
-            if type(n)==str:
-                print('True')
-                return redirect(request.url_root+n)
-            else:
-                return redirect(url_for('profile'))
-            # return render_template('profile.html',user=session['user'])
+            a=auth.get_account_info(user['idToken'])
+            print('login')
+            print(a)
+            if a['users'][0]['emailVerified']==False:
+                if type(n)==str:
+                    return "Email not verified. Please verify your email to <a href='/login?next="+n+"'>login</a>."
+                else:
+                    return "Email not verified. Please verify your email to <a href='/login'>login</a>."
+            else :
+                session['user']=email
+                session['localId']=user['localId']
+                session['idToken']=user['idToken']
+                ref=db.collection('users').document(user['localId'])
+                ref.set({'id':user['localId'], 'name':session['username'],'email':email})
+                if type(n)==str:
+                    return redirect(request.url_root+n)
+                else:
+                    return redirect(url_for('profile'))
         except:
-            return ('Username or password is incorrect')
+            return "Couldn't login please check your credentials or signup"
     return render_template('login.html', next=n)
 
 @app.route('/signup', methods=['GET','POST'])
 def signup():
     n=request.args.get('next')
-    print(n)
     if request.method=='POST':
         name=request.form['name']
         email=request.form['email']
         password=request.form['password']
         try:
             user=auth.create_user_with_email_and_password(email,password)
-            user=auth.sign_in_with_email_and_password(email,password)
-            # auth.send_email_verification(user['idToken'])
-            user['displayName']=name
-            session['user']=email
-            session['user_id']=user['localId']
-            # ref=db.collection('users').document(user['localId'])
-            # ref.set({'name':name,'email':email,'id':user['localId']})
+            auth.send_email_verification(user['idToken'])
+            session['username']=name
             if type(n)==str:
-                print('True')
-                return redirect(request.url_root+n)
+                return "Email not verified. Please verify your email to <a href='/login?next="+n+"'>login</a>."
             else:
-                return redirect(url_for('profile'))
+                # return redirect(url_for('profile'))
+                return "Email not verified. Please verify your email to <a href='/login'>login</a>."
         except:
-            return ('The email already exists')
+            return 'The email already exists'
     return render_template('signup.html', next=n)
-
-@app.route('/profile')
-@authenticate_user
-def profile():
-    return render_template('profile.html', user=session['user'])
 
 @app.route('/logout')
 @authenticate_user
 def logout():
+    print('logout')
+    a=auth.get_account_info(session['idToken'])
+    print(a)
     session.clear()
-    # return redirect(url_for('index'))
     return redirect('/login')
+
+@app.route('/forgot', methods=['GET','POST'])
+def forgot_password():
+    email=request.args.get('email')
+    if 'user' not in session:
+        auth.send_password_reset_email(email)
+        return 'Password reset email sent'
+    else:
+        return 'You are already logged in'
+
+@app.route('/profile')
+@authenticate_user
+def profile():
+    data=db.collection('users').document(session['localId']).get()
+    data=data.to_dict()
+    print(data)
+    return render_template('profile.html', name=data['name'], email=data['email'])
+
+@app.route('/edit-profile', methods=['GET','POST'])
+@authenticate_user
+def editProfile():
+    name=request.form['name']
+    email=request.form['email']
+    ref=db.collection('users').document(session['localId'])
+    ref.update({'name':name, 'email':email})
+    return {'name':name, 'email':email}
+
+@app.route('/delete-user', methods=['GET','POST'])
+@authenticate_user
+def deleteUser():
+    auth.delete_user(session['idToken'])
+    a=auth.get_account_info(session['idToken'])
+    print('delete')
+    print(a)
+    # ref=db.collection('users').document(session['localId']).delete()
+    # session.clear()
+    return redirect(url_for('login'))   
 
 @app.route('/assessment')
 @authenticate_user

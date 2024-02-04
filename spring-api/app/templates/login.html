@@ -13,12 +13,16 @@
     {% endif %}
         Email: <input type="text" name="email"><br>
         Password: <input type="password" name="password"><br>
+        <a href="/forgot/"{{email}}>Forgot Password</a><br>
         <input type="submit" value="Login">
-        {% if next %}
-        <a href="/signup?next={{next}}">Register</a>
-        {% else %}
-        <a href="/signup">Register</a>
-        {% endif %}
+
+    {% if next %}
+    <a href="/signup?next={{next}}">Register</a>
+    {% else %}
+    <a href="/signup">Register</a>
+    {% endif %}
+        
+        
     </form>
 </body>
 </html>
