@@ -5,7 +5,7 @@
 // class Home extends StatefulWidget {
 //   const Home({super.key});
 
-//   static const String routeName = '/home';
+//   static const String routeName = '/homepage';
 
 //   @override
 //   State<Home> createState() => _HomeState();
@@ -44,7 +44,8 @@
 //               TextField(
 //                 onChanged: (value) {
 //                   setState(() {
-//                     url = 'http://127.0.0.1:5000/api?query=${value.toString()}';
+//                     url =
+//                         'http://192.168.29.128:4000/api?query=${value.toString()}';
 //                   });
 //                 },
 //                 decoration: const InputDecoration(
@@ -72,7 +73,8 @@
 //               const SizedBox(height: 16),
 //               Text(
 //                 output,
-//                 style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+//                 style:
+//                     const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
 //               ),
 //               const SizedBox(height: 16),
 //               Row(

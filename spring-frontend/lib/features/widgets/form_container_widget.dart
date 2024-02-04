@@ -35,6 +35,8 @@ class _FormContainerWidgetState extends State<FormContainerWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16.0),
@@ -51,9 +53,9 @@ class _FormContainerWidgetState extends State<FormContainerWidget> {
         ],
       ),
       child: TextFormField(
-        style: TextStyle(color: Theme.of(context).primaryColorDark),
+        style: TextStyle(color: colorScheme.onSurface),
         key: widget.fieldKey,
-        obscureText: widget.isPasswordField ?? false,
+        obscureText: widget.isPasswordField ?? false ? _obscureText : false,
         controller: widget.controller,
         onSaved: widget.onSaved,
         validator: widget.validator,
@@ -66,8 +68,8 @@ class _FormContainerWidgetState extends State<FormContainerWidget> {
           suffixIcon: widget.isPasswordField ?? false
               ? IconButton(
                   icon: Icon(
-                    _obscureText ? Icons.visibility : Icons.visibility_off,
-                    color: Theme.of(context).primaryColorDark,
+                    _obscureText ? Icons.visibility_off : Icons.visibility,
+                    color: colorScheme.onSurface,
                   ),
                   onPressed: () {
                     setState(() {
