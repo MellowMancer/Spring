@@ -130,16 +130,7 @@ def forgot_password():
         return 'Password reset email sent'
     else:
         return 'You are already logged in'
-
-
-@app.route('/profile')
-@authenticate_user
-def profile():
-    data=db.collection('users').document(session['localId']).get()
-    data=data.to_dict()
-    print(data)
-    return render_template('profile.html', name=data['name'], email=data['email'])
-    # return render_template('profile.html', name=data['name'], email=data['email'])
+    
 
 @app.route('/logout')
 @authenticate_user
@@ -149,6 +140,35 @@ def logout():
     print(a)
     session.clear()
     # return redirect(url_for('index'))
+    return redirect('/login')
+
+@app.route('/profile')
+@authenticate_user
+def profile():
+    data=db.collection('users').document(session['localId']).get()
+    data=data.to_dict()
+    print(data)
+    return render_template('profile.html', name=data['name'], email=data['email'])
+
+@app.route('/update', methods=['GET','POST'])
+@authenticate_user
+def update():
+    name=request.form['name']
+    email=request.form['email']
+    ref=db.collection('users').document(session['localId'])
+    ref.update({'name':name, 'email':email})
+    return redirect(url_for('profile'))
+
+@app.route('/delete-user')
+@authenticate_user
+def delete():
+    a=auth.get_account_info(session['idToken'])
+    try:
+        auth.delete_user(session['localId'])
+        ref=db.collection('users').document(session['localId']).delete()
+        session.clear()
+    except:
+        return redirect(url_for('profile'))
     return redirect('/login')
 
 @app.route('/assessment')
