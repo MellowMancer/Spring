@@ -38,56 +38,90 @@ class _LoginPageState extends State<LoginPage> {
     return null;
   }
 
+  Future<bool> logIn() async {
+    final String email = emailController.text;
+    final String password = passwordController.text;
+
+    await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+
+    if (FirebaseAuth.instance.currentUser != null) {
+      return true;
+    } 
+    else {
+      // ignore: use_build_context_synchronously
+      showDialog(
+         context: context,
+         builder: (BuildContext context){
+          return AlertDialog(
+            title: const Text('Error'),
+            content: const SingleChildScrollView(
+              child: ListBody(
+                children: <Widget>[
+                  Text("Invalid Credentials"),
+                ],
+              ),
+            ),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('OK'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ],
+          );
+        },
+      );
+      return false;
+    }
+
+    // Send a POST request to the Flask signup endpoint
+    // final response = await http.post(
+    //   Uri.parse('http://10.0.2.2:5000/login'),
+    //   body: {
+    //     'email': email,
+    //     'password': password,
+    //   },
+    // );
+    // if (response.statusCode == 200) {
+    //   return true;
+    // } else {
+    //   var responseJson = json.decode(response.body);
+    //   var errorMessage = responseJson['error'];
+    //   // ignore: use_build_context_synchronously
+    //   showDialog(
+    //     context: context,
+    //     builder: (BuildContext context) {
+    //       return AlertDialog(
+    //         title: const Text('Error'),
+    //         content: const SingleChildScrollView(
+    //           child: ListBody(
+    //             children: <Widget>[
+    //               Text("Invalid Credentials"),
+    //             ],
+    //           ),
+    //         ),
+    //         actions: <Widget>[
+    //           TextButton(
+    //             child: const Text('OK'),
+    //             onPressed: () {
+    //               Navigator.of(context).pop();
+    //             },
+    //           ),
+    //         ],
+    //       );
+    //     },
+    //   );
+    //   return false;
+    // }
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-
-    Future<bool> logIn() async {
-      print('Logging in...');
-      final String email = emailController.text;
-      final String password = passwordController.text;
-
-      // Send a POST request to the Flask signup endpoint
-      final response = await http.post(
-        Uri.parse('http://10.0.2.2:5000/login'),
-        body: {
-          'email': email,
-          'password': password,
-        },
-      );
-      if (response.statusCode == 200) {
-        return true;
-      } 
-      else {
-        var responseJson = json.decode(response.body);
-        var errorMessage = responseJson['error'];
-        // ignore: use_build_context_synchronously
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Error'),
-              content: const SingleChildScrollView(
-                child: ListBody(
-                  children: <Widget>[
-                    Text("Invalid Credentials"),
-                  ],
-                ),
-              ),
-              actions: <Widget>[
-                TextButton(
-                  child: const Text('OK'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
-            );
-          },
-        );
-        return false;
-      }
-    }
 
     return MaterialApp(
         theme: ThemeData.light(),

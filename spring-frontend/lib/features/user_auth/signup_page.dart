@@ -2,10 +2,10 @@
 import 'package:flutter/material.dart';
 import 'package:spring/features/user_auth/login_page.dart';
 import 'package:spring/features/widgets/form_container_widget.dart';
-import 'package:spring/features/screens/home_page.dart';
 import 'package:spring/features/widgets/bottom_navigation_bar.dart';
-// import 'package:spring/features/firebase_auth_implementation/firebase_auth_services.dart';
-import 'package:logger/logger.dart';
+import 'package:spring/features/firebase_auth_implementation/firebase_auth_services.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -86,28 +86,37 @@ class _SignUpPageState extends State<SignUpPage> {
     final String email = emailController.text;
     final String password = passwordController.text;
 
-    // Send a POST request to the Flask signup endpoint
-    final response = await http.post(
-      Uri.parse('http://10.0.2.2:5000/signup'),
-      body: {
-        'name': name,
-        'displayName': displayName,
-        'email': email,
-        'password': password,
-      },
+
+    await FirebaseAuth.instance.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
     );
-    if (response.statusCode == 200) {
+    await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+
+    final currentUser = FirebaseAuth.instance.currentUser;
+    final db = FirebaseFirestore.instance;
+
+    db.collection('users').doc(currentUser?.uid).set({
+      'id': currentUser?.uid,
+      'name': name,
+      'displayName': displayName,
+      'email': email,
+    });
+
+    if (FirebaseAuth.instance.currentUser != null) {
       return true;
-    } else {
-      var responseJson = json.decode(response.body);
-      var errorMessage = responseJson['error'];
+    } 
+    else {
       // ignore: use_build_context_synchronously
       showDialog(
-        context: context,
-        builder: (BuildContext context) {
+         context: context,
+         builder: (BuildContext context){
           return AlertDialog(
             title: const Text('Error'),
-            content: SingleChildScrollView(
+            content: const SingleChildScrollView(
               child: ListBody(
                 children: <Widget>[
                   Text("Email already exists"),
@@ -127,6 +136,48 @@ class _SignUpPageState extends State<SignUpPage> {
       );
       return false;
     }
+
+    // Send a POST request to the Flask signup endpoint
+    // final response = await http.post(
+    //   Uri.parse('http://10.0.2.2:5000/signup'),
+    //   body: {
+    //     'name': name,
+    //     'displayName': displayName,
+    //     'email': email,
+    //     'password': password,
+    //   },
+    // );
+    // if (response.statusCode == 200) {
+    //   return true;
+    // } else {
+    //   var responseJson = json.decode(response.body);
+    //   var errorMessage = responseJson['error'];
+    //   // ignore: use_build_context_synchronously
+    //   showDialog(
+    //     context: context,
+    //     builder: (BuildContext context) {
+    //       return AlertDialog(
+    //         title: const Text('Error'),
+    //         content: SingleChildScrollView(
+    //           child: ListBody(
+    //             children: <Widget>[
+    //               Text("Email already exists"),
+    //             ],
+    //           ),
+    //         ),
+    //         actions: <Widget>[
+    //           TextButton(
+    //             child: const Text('OK'),
+    //             onPressed: () {
+    //               Navigator.of(context).pop();
+    //             },
+    //           ),
+    //         ],
+    //       );
+    //     },
+    //   );
+    //   return false;
+    // }
   }
 
   @override
@@ -207,7 +258,7 @@ class _SignUpPageState extends State<SignUpPage> {
                                 Navigator.pushAndRemoveUntil(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => LoginPage()),
+                                      builder: (context) => const LoginPage()),
                                   (Route<dynamic> route) => false,
                                 );
                               },

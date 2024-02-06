@@ -24,6 +24,7 @@ dependencies:
   logger: ^2.0.2
   intl: ^0.18.1
   http: ^0.13.4
+  get: ^4.6.6
 
 dev_dependencies:
   flutter_test:
