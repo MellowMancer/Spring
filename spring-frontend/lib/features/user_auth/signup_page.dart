@@ -10,6 +10,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:spring/main.dart';
+import 'package:spring/features/user_auth/email_verification_page.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -88,56 +90,112 @@ class _SignUpPageState extends State<SignUpPage> {
     final String email = emailController.text;
     final String password = passwordController.text;
 
-
-    await FirebaseAuth.instance.createUserWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
-    await FirebaseAuth.instance.signInWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
-
-    final currentUser = FirebaseAuth.instance.currentUser;
-    final db = FirebaseFirestore.instance;
-
-    db.collection('users').doc(currentUser?.uid).set({
-      'id': currentUser?.uid,
-      'name': name,
-      'displayName': displayName,
-      'email': email,
-    });
-
-    if (FirebaseAuth.instance.currentUser != null) {
-      return true;
-    } 
-    else {
-      // ignore: use_build_context_synchronously
-      showDialog(
-         context: context,
-         builder: (BuildContext context){
-          return AlertDialog(
-            title: const Text('Error'),
-            content: const SingleChildScrollView(
-              child: ListBody(
-                children: <Widget>[
-                  Text("Email already exists"),
-                ],
-              ),
-            ),
-            actions: <Widget>[
-              TextButton(
-                child: const Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          );
-        },
+    try {
+      UserCredential userCredential =
+          await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
       );
+      // await FirebaseAuth.instance.signInWithEmailAndPassword(
+      //   email: email,
+      //   password: password,
+      // );
+
+      // final currentUser = FirebaseAuth.instance.currentUser;
+      // final db = FirebaseFirestore.instance;
+
+      // db.collection('users').doc(currentUser?.uid).set({
+      //   'id': currentUser?.uid,
+      //   'name': name,
+      //   'displayName': displayName,
+      //   'email': email,
+      // });
+    } on FirebaseAuthException catch (e) {
+      if (e.code == 'weak-password') {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Error'),
+              content: const SingleChildScrollView(
+                child: ListBody(
+                  children: <Widget>[
+                    Text("The password provided is too weak."),
+                  ],
+                ),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('OK'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+        return false;
+      } else if (e.code == 'email-already-in-use') {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Error'),
+              content: const SingleChildScrollView(
+                child: ListBody(
+                  children: <Widget>[
+                    Text("This account already exists. Please login."),
+                  ],
+                ),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('OK'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+        return false;
+      }
+    } catch (e) {
+      debugPrint(e.toString());
       return false;
     }
+
+    // if (FirebaseAuth.instance.currentUser != null) {
+    //   return true;
+    // } else {
+    //   // ignore: use_build_context_synchronously
+    //   showDialog(
+    //     context: context,
+    //     builder: (BuildContext context) {
+    //       return AlertDialog(
+    //         title: const Text('Error'),
+    //         content: const SingleChildScrollView(
+    //           child: ListBody(
+    //             children: <Widget>[
+    //               Text("Email already exists"),
+    //             ],
+    //           ),
+    //         ),
+    //         actions: <Widget>[
+    //           TextButton(
+    //             child: const Text('OK'),
+    //             onPressed: () {
+    //               Navigator.of(context).pop();
+    //             },
+    //           ),
+    //         ],
+    //       );
+    //     },
+    //   );
+    //   return false;
+    return true;
 
     // Send a POST request to the Flask signup endpoint
     // final response = await http.post(
@@ -190,6 +248,7 @@ class _SignUpPageState extends State<SignUpPage> {
     //       tertiary: const Color.fromARGB(255, 12, 66, 172),
     //     );
     final colorScheme = Theme.of(context).colorScheme;
+    final auth = FirebaseAuth.instance;
 
     return MaterialApp(
         theme: ThemeData.light(),
@@ -278,14 +337,25 @@ class _SignUpPageState extends State<SignUpPage> {
                               // All fields are valid, proceed with signUp
                               bool isValid = await signUp();
                               if (isValid) {
-                                // ignore: use_build_context_synchronously
-                                Navigator.pushAndRemoveUntil(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          const BottomNavBar()),
-                                  (Route<dynamic> route) => false,
-                                );
+                                if (auth.currentUser != null) {
+                                  // ignore: use_build_context_synchronously
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              EmailVerificationScreen(
+                                                  email: emailController.text,
+                                                  password: passwordController.text,
+                                                  name: nameController.text,
+                                                  displayName: displayNameController.text)));
+                                }
+                                // Navigator.pushAndRemoveUntil(
+                                //   context,
+                                //   MaterialPageRoute(
+                                //       builder: (context) =>
+                                //           const BottomNavBar()),
+                                //   (Route<dynamic> route) => false,
+                                // );
                               }
                             }
                           },
