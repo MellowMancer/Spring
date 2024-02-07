@@ -10,7 +10,8 @@ class ChatApp extends StatelessWidget {
     return MaterialApp(
       title: 'Chat App',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSwatch(primarySwatch: Colors.blue).copyWith(secondary: Colors.blueAccent),
+        primaryColor: Colors.blue,
+        fontFamily: 'Roboto', colorScheme: ColorScheme.fromSwatch().copyWith(secondary: Colors.blueAccent),
       ),
       home: ChatScreen(),
     );
@@ -24,6 +25,15 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final List<ChatMessage> _messages = <ChatMessage>[];
+
+  @override
+  void initState() {
+    super.initState();
+    // Example of receiving a message
+    _messages.add(ChatMessage(text: "Hello there!", isMe: false));
+    // Example of sending a message
+    _messages.add(ChatMessage(text: "Hi! How can I help you?", isMe: true));
+  }
 
   void _handleSubmitted(String text) {
     // Simulate sending a message
@@ -41,7 +51,6 @@ class _ChatScreenState extends State<ChatScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Chat'),
-        backgroundColor: Colors.blue,
         elevation: 0,
         actions: <Widget>[
           IconButton(
@@ -119,6 +128,9 @@ class ChatMessage extends StatelessWidget {
     final ThemeData themeData = Theme.of(context);
     final double radius = 10.0;
 
+    Color? backgroundColor = isMe ? themeData.colorScheme.secondary : Colors.grey[300];
+    Color textColor = isMe ? Colors.white : Colors.black;
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
       child: Row(
@@ -130,14 +142,15 @@ class ChatMessage extends StatelessWidget {
             margin: const EdgeInsets.only(right: 16.0),
             child: CircleAvatar(
               child: Text(isMe ? 'Me' : 'Other'),
-              backgroundColor: isMe ? themeData.colorScheme.secondary : Colors.grey[400],
+              backgroundColor:
+                  isMe ? themeData.colorScheme.secondary : Colors.grey[400],
             ),
           ),
           Flexible(
             child: Container(
               padding: const EdgeInsets.all(12.0),
               decoration: BoxDecoration(
-                color: isMe ? themeData.colorScheme.secondary : Colors.grey[300],
+                color: backgroundColor,
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(isMe ? radius : 0.0),
                   topRight: Radius.circular(isMe ? 0.0 : radius),
@@ -150,13 +163,13 @@ class ChatMessage extends StatelessWidget {
                 children: <Widget>[
                   Text(
                     text,
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(color: textColor, fontSize: 16.0),
                   ),
                   SizedBox(height: 4.0),
                   Text(
                     '12:34 PM', // Example time, replace with actual time
                     style: TextStyle(
-                      color: Colors.white70,
+                      color: textColor.withAlpha(180),
                       fontSize: 12.0,
                     ),
                   ),
