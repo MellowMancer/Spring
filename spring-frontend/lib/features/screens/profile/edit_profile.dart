@@ -69,26 +69,17 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                               hintText: "Name",
 
                               isPasswordField: false,),
-                          const SizedBox(height: 15),
+                          const SizedBox(height: 30),
                           FormContainerWidget(
                               controller: displayNameController,
                               hintText: "Display Name",
                               isPasswordField: false,),
-                          const SizedBox(height: 15),
+                          const SizedBox(height: 30),
                           FormContainerWidget(
                               controller: emailController,
                               hintText: "Email",
                               isPasswordField: false,),
-                          const SizedBox(height: 15),
-                          FormContainerWidget(
-                              controller: passwordController,
-                              hintText: "Password",
-                              isPasswordField: true,),
-                          const SizedBox(height: 15),
-                          FormContainerWidget(
-                              controller: confirmPasswordController,
-                              hintText: "Confirm Password",
-                              isPasswordField: true,),
+                          const SizedBox(height: 30),
                           ],
                           ),
                           ),
