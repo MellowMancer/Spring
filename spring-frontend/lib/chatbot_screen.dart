@@ -13,6 +13,7 @@ class ChatApp extends StatelessWidget {
         primaryColor: Colors.blue,
         fontFamily: 'Roboto', colorScheme: ColorScheme.fromSwatch().copyWith(secondary: Colors.blueAccent),
       ),
+      darkTheme: ThemeData.dark(),
       home: ChatScreen(),
     );
   }
@@ -25,6 +26,8 @@ class ChatScreen extends StatefulWidget {
 
 class _ChatScreenState extends State<ChatScreen> {
   final List<ChatMessage> _messages = <ChatMessage>[];
+  final TextEditingController _textController = TextEditingController();
+  bool _isComposing = false;
 
   @override
   void initState() {
@@ -36,13 +39,26 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _handleSubmitted(String text) {
+    if (text.isEmpty) return;
+    _textController.clear();
+    setState(() {
+      _isComposing = false;
+    });
     // Simulate sending a message
     ChatMessage message = ChatMessage(
       text: text,
       isMe: true, // Change this to false for incoming messages
+      isSending: true,
     );
     setState(() {
       _messages.insert(0, message);
+    });
+
+    // Simulate receiving a response after 1 second
+    Future.delayed(Duration(seconds: 1), () {
+      setState(() {
+        _messages.insert(0, ChatMessage(text: "Got it!", isMe: false));
+      });
     });
   }
 
@@ -70,17 +86,7 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
           Divider(height: 1.0),
           Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 5.0,
-                  spreadRadius: 1.0,
-                  offset: Offset(0, -2),
-                ),
-              ],
-            ),
+            color: Theme.of(context).cardColor,
             child: _buildTextComposer(),
           ),
         ],
@@ -97,17 +103,22 @@ class _ChatScreenState extends State<ChatScreen> {
           children: <Widget>[
             Flexible(
               child: TextField(
+                controller: _textController,
+                onChanged: (String text) {
+                  setState(() {
+                    _isComposing = text.isNotEmpty;
+                  });
+                },
                 onSubmitted: _handleSubmitted,
-                decoration: InputDecoration(
+                decoration: InputDecoration.collapsed(
                   hintText: 'Send a message',
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.symmetric(horizontal: 16.0),
+                  hintStyle: TextStyle(color: Colors.grey),
                 ),
               ),
             ),
             IconButton(
               icon: Icon(Icons.send),
-              onPressed: () => _handleSubmitted(''),
+              onPressed: _isComposing ? () => _handleSubmitted(_textController.text) : null,
               color: Theme.of(context).colorScheme.secondary,
             ),
           ],
@@ -118,34 +129,35 @@ class _ChatScreenState extends State<ChatScreen> {
 }
 
 class ChatMessage extends StatelessWidget {
-  ChatMessage({required this.text, required this.isMe});
+  ChatMessage({required this.text, required this.isMe, this.isSending = false});
 
   final String text;
   final bool isMe;
+  final bool isSending;
 
   @override
   Widget build(BuildContext context) {
     final ThemeData themeData = Theme.of(context);
     final double radius = 10.0;
 
-    Color? backgroundColor = isMe ? themeData.colorScheme.secondary : Colors.grey[300];
+    Color? backgroundColor = isMe ? Color(0xFF2196F3) : Color(0xFF1976D2); // Primary and secondary colors for chat bubbles
     Color textColor = isMe ? Colors.white : Colors.black;
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
       child: Row(
-        mainAxisAlignment:
-            isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Container(
-            margin: const EdgeInsets.only(right: 16.0),
-            child: CircleAvatar(
-              child: Text(isMe ? 'Me' : 'Other'),
-              backgroundColor:
-                  isMe ? themeData.colorScheme.secondary : Colors.grey[400],
+          if (!isMe) ...[
+            Container(
+              margin: const EdgeInsets.only(right: 16.0),
+              child: CircleAvatar(
+                child: Text('A'), // Placeholder for sender's initials
+                backgroundColor: Color(0xFF1976D2), // Use secondary color for sender's avatar background
+              ),
             ),
-          ),
+          ],
           Flexible(
             child: Container(
               padding: const EdgeInsets.all(12.0),
@@ -158,21 +170,27 @@ class ChatMessage extends StatelessWidget {
                   bottomRight: Radius.circular(radius),
                 ),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Text(
-                    text,
-                    style: TextStyle(color: textColor, fontSize: 16.0),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Text(
+                        text,
+                        style: TextStyle(color: textColor, fontSize: 16.0),
+                      ),
+                      SizedBox(height: 4.0),
+                      Text(
+                        '12:34 PM', // Example time, replace with actual time
+                        style: TextStyle(
+                          color: textColor.withAlpha(180),
+                          fontSize: 12.0,
+                        ),
+                      ),
+                    ],
                   ),
-                  SizedBox(height: 4.0),
-                  Text(
-                    '12:34 PM', // Example time, replace with actual time
-                    style: TextStyle(
-                      color: textColor.withAlpha(180),
-                      fontSize: 12.0,
-                    ),
-                  ),
+                  if (isSending) CircularProgressIndicator(), // Sending indicator
                 ],
               ),
             ),
