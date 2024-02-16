@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:adaptive_theme/adaptive_theme.dart';
 
 void main() {
   runApp(ChatApp());
@@ -7,14 +8,20 @@ void main() {
 class ChatApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Chat App',
-      theme: ThemeData(
+    return AdaptiveTheme(
+      light: ThemeData(
         primaryColor: Colors.blue,
-        fontFamily: 'Roboto', colorScheme: ColorScheme.fromSwatch().copyWith(secondary: Colors.blueAccent),
+        fontFamily: 'Roboto',
+        colorScheme: ColorScheme.fromSwatch().copyWith(secondary: Colors.blueAccent),
       ),
-      darkTheme: ThemeData.dark(),
-      home: ChatScreen(),
+      dark: ThemeData.dark(),
+      initial: AdaptiveThemeMode.light,
+      builder: (theme, darkTheme) => MaterialApp(
+        title: 'Chat App',
+        theme: theme,
+        darkTheme: darkTheme,
+        home: ChatScreen(),
+      ),
     );
   }
 }
@@ -32,9 +39,11 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
-    // Example of receiving a message
+    _addInitialMessages();
+  }
+
+  void _addInitialMessages() {
     _messages.add(ChatMessage(text: "Hello there!", isMe: false));
-    // Example of sending a message
     _messages.add(ChatMessage(text: "Hi! How can I help you?", isMe: true));
   }
 
@@ -44,10 +53,13 @@ class _ChatScreenState extends State<ChatScreen> {
     setState(() {
       _isComposing = false;
     });
-    // Simulate sending a message
+    _sendMessage(text);
+  }
+
+  void _sendMessage(String text) {
     ChatMessage message = ChatMessage(
       text: text,
-      isMe: true, // Change this to false for incoming messages
+      isMe: true,
       isSending: true,
     );
     setState(() {
@@ -85,10 +97,7 @@ class _ChatScreenState extends State<ChatScreen> {
             ),
           ),
           Divider(height: 1.0),
-          Container(
-            color: Theme.of(context).cardColor,
-            child: _buildTextComposer(),
-          ),
+          _buildTextComposer(),
         ],
       ),
     );
@@ -109,9 +118,9 @@ class _ChatScreenState extends State<ChatScreen> {
                     _isComposing = text.isNotEmpty;
                   });
                 },
-                onSubmitted: _handleSubmitted,
+                onSubmitted: _isComposing ? _handleSubmitted : null,
                 decoration: InputDecoration.collapsed(
-                  hintText: 'Send a message',
+                  hintText: 'Send a message', 
                   hintStyle: TextStyle(color: Colors.grey),
                 ),
               ),
@@ -140,7 +149,7 @@ class ChatMessage extends StatelessWidget {
     final ThemeData themeData = Theme.of(context);
     final double radius = 10.0;
 
-    Color? backgroundColor = isMe ? Color(0xFF2196F3) : Color(0xFF1976D2); // Primary and secondary colors for chat bubbles
+    Color? backgroundColor = isMe ? Color(0xFF2196F3) : Color.fromARGB(255, 255, 255, 255);
     Color textColor = isMe ? Colors.white : Colors.black;
 
     return Container(
@@ -153,8 +162,8 @@ class ChatMessage extends StatelessWidget {
             Container(
               margin: const EdgeInsets.only(right: 16.0),
               child: CircleAvatar(
-                child: Text('A'), // Placeholder for sender's initials
-                backgroundColor: Color(0xFF1976D2), // Use secondary color for sender's avatar background
+                child: Text('A'),
+                backgroundColor: Color(0xFF1976D2),
               ),
             ),
           ],
@@ -182,7 +191,7 @@ class ChatMessage extends StatelessWidget {
                       ),
                       SizedBox(height: 4.0),
                       Text(
-                        '12:34 PM', // Example time, replace with actual time
+                        '12:34 PM',
                         style: TextStyle(
                           color: textColor.withAlpha(180),
                           fontSize: 12.0,
@@ -190,7 +199,7 @@ class ChatMessage extends StatelessWidget {
                       ),
                     ],
                   ),
-                  if (isSending) CircularProgressIndicator(), // Sending indicator
+                  if (isSending) CircularProgressIndicator(),
                 ],
               ),
             ),
