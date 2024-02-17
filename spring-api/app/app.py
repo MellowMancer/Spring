@@ -1,6 +1,6 @@
-from flask import render_template, request, redirect, url_for
-from login import authenticate_user, app, session
-from config import auth, db
+from flask import Flask, render_template, request, redirect, url_for
+from login import authenticate_user, app
+from config import auth, db, session, app
 
 @app.route('/assessment')
 @authenticate_user
