@@ -24,7 +24,7 @@ class SignUpPage extends StatefulWidget {
 
 class _SignUpPageState extends State<SignUpPage> {
   // final FirebaseAuthServices _auth = FirebaseAuthServices();
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _signUpKey = GlobalKey<FormState>();
 
   TextEditingController nameController = TextEditingController();
   TextEditingController displayNameController = TextEditingController();
@@ -96,20 +96,6 @@ class _SignUpPageState extends State<SignUpPage> {
         email: email,
         password: password,
       );
-      // await FirebaseAuth.instance.signInWithEmailAndPassword(
-      //   email: email,
-      //   password: password,
-      // );
-
-      // final currentUser = FirebaseAuth.instance.currentUser;
-      // final db = FirebaseFirestore.instance;
-
-      // db.collection('users').doc(currentUser?.uid).set({
-      //   'id': currentUser?.uid,
-      //   'name': name,
-      //   'displayName': displayName,
-      //   'email': email,
-      // });
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
         showDialog(
@@ -138,6 +124,7 @@ class _SignUpPageState extends State<SignUpPage> {
         return false;
       } 
       else if (e.code == 'email-already-in-use') {
+        // ignore: use_build_context_synchronously
         showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -168,77 +155,7 @@ class _SignUpPageState extends State<SignUpPage> {
       return false;
     }
 
-    // if (FirebaseAuth.instance.currentUser != null) {
-    //   return true;
-    // } else {
-    //   // ignore: use_build_context_synchronously
-    //   showDialog(
-    //     context: context,
-    //     builder: (BuildContext context) {
-    //       return AlertDialog(
-    //         title: const Text('Error'),
-    //         content: const SingleChildScrollView(
-    //           child: ListBody(
-    //             children: <Widget>[
-    //               Text("Email already exists"),
-    //             ],
-    //           ),
-    //         ),
-    //         actions: <Widget>[
-    //           TextButton(
-    //             child: const Text('OK'),
-    //             onPressed: () {
-    //               Navigator.of(context).pop();
-    //             },
-    //           ),
-    //         ],
-    //       );
-    //     },
-    //   );
-    //   return false;
     return true;
-
-    // Send a POST request to the Flask signup endpoint
-    // final response = await http.post(
-    //   Uri.parse('http://10.0.2.2:5000/signup'),
-    //   body: {
-    //     'name': name,
-    //     'displayName': displayName,
-    //     'email': email,
-    //     'password': password,
-    //   },
-    // );
-    // if (response.statusCode == 200) {
-    //   return true;
-    // } else {
-    //   var responseJson = json.decode(response.body);
-    //   var errorMessage = responseJson['error'];
-    //   // ignore: use_build_context_synchronously
-    //   showDialog(
-    //     context: context,
-    //     builder: (BuildContext context) {
-    //       return AlertDialog(
-    //         title: const Text('Error'),
-    //         content: SingleChildScrollView(
-    //           child: ListBody(
-    //             children: <Widget>[
-    //               Text("Email already exists"),
-    //             ],
-    //           ),
-    //         ),
-    //         actions: <Widget>[
-    //           TextButton(
-    //             child: const Text('OK'),
-    //             onPressed: () {
-    //               Navigator.of(context).pop();
-    //             },
-    //           ),
-    //         ],
-    //       );
-    //     },
-    //   );
-    //   return false;
-    // }
   }
 
   @override
@@ -267,7 +184,7 @@ class _SignUpPageState extends State<SignUpPage> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: Form(
-                  key: _formKey,
+                  key: _signUpKey,
                   child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -334,7 +251,7 @@ class _SignUpPageState extends State<SignUpPage> {
                         const SizedBox(height: 10),
                         ElevatedButton(
                           onPressed: () async {
-                            if (_formKey.currentState!.validate()) {
+                            if (_signUpKey.currentState!.validate()) {
                               // All fields are valid, proceed with signUp
                               bool isValid = await signUp();
                               if (isValid) {

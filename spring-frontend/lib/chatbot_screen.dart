@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 void main() {
   runApp(ChatApp());
@@ -12,7 +14,8 @@ class ChatApp extends StatelessWidget {
       light: ThemeData(
         primaryColor: Colors.blue,
         fontFamily: 'Roboto',
-        colorScheme: ColorScheme.fromSwatch().copyWith(secondary: Colors.blueAccent),
+        colorScheme:
+            ColorScheme.fromSwatch().copyWith(secondary: Colors.blueAccent),
       ),
       dark: ThemeData.dark(),
       initial: AdaptiveThemeMode.light,
@@ -56,33 +59,39 @@ class _ChatScreenState extends State<ChatScreen> {
     _sendMessage(text);
   }
 
-  void _sendMessage(String text) {
-    ChatMessage message = ChatMessage(
-      text: text,
-      isMe: true,
-      isSending: true,
-    );
-    setState(() {
-      _messages.insert(0, message);
-    });
+  void _sendMessage(String text) async {
+  ChatMessage message = ChatMessage(
+    text: text,
+    isMe: true,
+    isSending: true,
+  );
+  setState(() {
+    _messages.insert(0, message);
+  });
+  final response = await http.post(
+    Uri.parse('http://10.0.2.2:5000/responseMessage'),
+    body: {
+      'message': message.text,
+    },
+  );
 
-    // Simulate receiving a response after 1 second
-    Future.delayed(Duration(seconds: 1), () {
-      setState(() {
-        _messages.insert(0, ChatMessage(text: "Got it!", isMe: false));
-      });
-    });
-  }
+  Map<String, dynamic> jsonResponse = jsonDecode(response.body);
+  String botMessage = jsonResponse['response'];
+
+  setState(() {
+    _messages.insert(0, ChatMessage(text: botMessage, isMe: false));
+  });
+}
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Chat'),
+        title: const Text('Chat'),
         elevation: 0,
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.more_vert),
+            icon: const Icon(Icons.more_vert),
             onPressed: () {},
           ),
         ],
@@ -96,7 +105,7 @@ class _ChatScreenState extends State<ChatScreen> {
               itemBuilder: (_, int index) => _messages[index],
             ),
           ),
-          Divider(height: 1.0),
+          const Divider(height: 1.0),
           _buildTextComposer(),
         ],
       ),
@@ -119,15 +128,17 @@ class _ChatScreenState extends State<ChatScreen> {
                   });
                 },
                 onSubmitted: _isComposing ? _handleSubmitted : null,
-                decoration: InputDecoration.collapsed(
-                  hintText: 'Send a message', 
+                decoration: const InputDecoration.collapsed(
+                  hintText: 'Send a message',
                   hintStyle: TextStyle(color: Colors.grey),
                 ),
               ),
             ),
             IconButton(
-              icon: Icon(Icons.send),
-              onPressed: _isComposing ? () => _handleSubmitted(_textController.text) : null,
+              icon: const Icon(Icons.send),
+              onPressed: _isComposing
+                  ? () => _handleSubmitted(_textController.text)
+                  : null,
               color: Theme.of(context).colorScheme.secondary,
             ),
           ],
@@ -138,7 +149,11 @@ class _ChatScreenState extends State<ChatScreen> {
 }
 
 class ChatMessage extends StatelessWidget {
-  ChatMessage({required this.text, required this.isMe, this.isSending = false});
+  const ChatMessage(
+      {super.key,
+      required this.text,
+      required this.isMe,
+      this.isSending = false});
 
   final String text;
   final bool isMe;
@@ -147,23 +162,26 @@ class ChatMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ThemeData themeData = Theme.of(context);
-    final double radius = 10.0;
+    const double radius = 10.0;
 
-    Color? backgroundColor = isMe ? Color(0xFF2196F3) : Color.fromARGB(255, 255, 255, 255);
+    Color? backgroundColor = isMe
+        ? const Color(0xFF2196F3)
+        : const Color.fromARGB(255, 255, 255, 255);
     Color textColor = isMe ? Colors.white : Colors.black;
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
       child: Row(
-        mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment:
+            isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           if (!isMe) ...[
             Container(
               margin: const EdgeInsets.only(right: 16.0),
-              child: CircleAvatar(
-                child: Text('A'),
+              child: const CircleAvatar(
                 backgroundColor: Color(0xFF1976D2),
+                child: Text('A'),
               ),
             ),
           ],
@@ -175,8 +193,8 @@ class ChatMessage extends StatelessWidget {
                 borderRadius: BorderRadius.only(
                   topLeft: Radius.circular(isMe ? radius : 0.0),
                   topRight: Radius.circular(isMe ? 0.0 : radius),
-                  bottomLeft: Radius.circular(radius),
-                  bottomRight: Radius.circular(radius),
+                  bottomLeft: const Radius.circular(radius),
+                  bottomRight: const Radius.circular(radius),
                 ),
               ),
               child: Stack(
@@ -189,9 +207,9 @@ class ChatMessage extends StatelessWidget {
                         text,
                         style: TextStyle(color: textColor, fontSize: 16.0),
                       ),
-                      SizedBox(height: 4.0),
+                      const SizedBox(height: 4.0),
                       Text(
-                        '12:34 PM',
+                        TimeOfDay.now().format(context),
                         style: TextStyle(
                           color: textColor.withAlpha(180),
                           fontSize: 12.0,
@@ -199,7 +217,7 @@ class ChatMessage extends StatelessWidget {
                       ),
                     ],
                   ),
-                  if (isSending) CircularProgressIndicator(),
+                  // if (isSending) const CircularProgressIndicator(),
                 ],
               ),
             ),

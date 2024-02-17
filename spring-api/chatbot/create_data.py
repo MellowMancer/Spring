@@ -4,7 +4,7 @@ from langchain.vectorstores import Chroma
 
 
 
-with open("C:\\Users\\hp\\OneDrive - FCRIT\\Hackathons\\Google Solution Challenge\\Spring\\OpenAI (NOT USING)\\text(1).txt") as f:
+with open("text(1).txt") as f:
     data = f.read()
 text_splitter = RecursiveCharacterTextSplitter(
     # Set a really chunk size

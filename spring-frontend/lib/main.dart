@@ -6,6 +6,7 @@ import 'package:spring/features/app/splashscreen/splashscreen.dart';
 import 'package:spring/features/user_auth/login_page.dart';
 import 'package:spring/features/screens/home_page.dart';
 import 'package:spring/features/user_auth/signup_page.dart';
+import 'package:spring/chatbot_screen.dart';
 
 // import 'src/app.dart';
 import 'src/settings/settings_controller.dart';
@@ -60,6 +61,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
         // home: LoginForm(),
-        home: SplashScreen(child: LoginPage()));
+        home: SplashScreen(child: ChatApp())
+    );
   }
 }

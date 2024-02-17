@@ -27,6 +27,7 @@ dependencies:
   get: ^4.6.6
   shared_preferences: ^2.2.2
   adaptive_theme: ^3.6.0
+  fluttertoast: ^8.0.8
 
 dev_dependencies:
   flutter_test:
