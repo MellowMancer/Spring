@@ -34,7 +34,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
           Navigator.push(context, MaterialPageRoute(builder: (context) => const ChatScreen()));
         },
         backgroundColor: colorScheme.primary,
-        child: const Icon(Icons.chat),
+        child: const Icon(Icons.chat, color: Colors.black) ,
       ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
