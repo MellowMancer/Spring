@@ -38,7 +38,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
           );
         },
         backgroundColor: colorScheme.primary,
-        child: const Icon(Icons.chat),
+        child: const Icon(Icons.chat, color: Colors.black) ,
       ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
