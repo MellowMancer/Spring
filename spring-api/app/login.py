@@ -1,22 +1,22 @@
-from flask import Flask, render_template, request, redirect, url_for, session
+from flask import Flask, render_template, request, redirect, url_for
 from google.cloud.firestore_v1 import FieldFilter
 from functools import wraps
-from config import auth, db, firebase_admin
-
-app=Flask(__name__)
-app.secret_key='secret'
+from config import auth, db, firebase_admin, session, app
 
 def authenticate_user(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        try:
-            a=auth.get_account_info(session['idToken'])
-            print('Returning function')
+        # try:
+        #     a=auth.get_account_info(session['idToken'])
+        #     print('Returning fn')
+        #     return f(*args, **kwargs)
+        # except:
+        #     if 'user' in session:
+        #         print('Deleting user')
+        #         ref=db.collection('users').document(session['localId']).delete()
+        #         session.clear()
+        if 'user' in session:
             return f(*args, **kwargs)
-        except:
-            if 'user' in session:
-                ref=db.collection('users').document(session['localId']).delete()
-                session.clear()
 
         n=request.url
         n=n.split('/')
@@ -45,14 +45,14 @@ def login():
                     return "Email not verified. Please verify your email to <a href='/login?next="+n+"'>login</a>."
                 else:
                     return "Email not verified. Please verify your email to <a href='/login'>login</a>."
-            else:
+            else :
+                ref=db.collection('users').document(user['localId'])
+                ref.set({'id':user['localId'], 'name':session['username'],'email':email})
                 session['user']=email
                 session['localId']=user['localId']
                 session['idToken']=user['idToken']
-                ref=db.collection('users').document(session['localId'])
-                ref.set({'id':user['localId'], 'name':session['username'],'email':email})
-                print(ref.get().to_dict())
                 print('saved')
+                print(session)
                 if type(n)==str:
                     return redirect(request.url_root+n)
                 else:
@@ -92,16 +92,14 @@ def forgot_password():
     else:
         return 'You are already logged in'
 
-
 @app.route('/profile')
 @authenticate_user
 def profile():
-    data=db.collection('users').document(session['localId']).get()
-    data=data.to_dict()
-    print('profile')
-    print(data)
-    return render_template('profile.html', name=data['name'], email=data['email'])
+    # data=db.collection('users').document(session['localId']).get()
+    # data=data.to_dict()
+    # print(data)
     return render_template('profile.html')
+    return render_template('profile.html', name=data['name'], email=data['email'])
 
 @app.route('/logout')
 @authenticate_user
@@ -112,8 +110,8 @@ def logout():
 @app.route('/delete-user')
 @authenticate_user
 def delete_user():
-    firebase_admin.auth.delete_user(session['idToken'])
-    ref=db.collection('users').document(session['localId']).delete()
+    auth.delete_user(session['idToken'])
+    # ref=db.collection('users').document(session['localId']).delete()
     session.clear()
     return redirect('/login')
 

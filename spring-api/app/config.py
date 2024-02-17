@@ -1,3 +1,8 @@
+from flask import session, Flask
+
+app=Flask(__name__)
+app.secret_key='secret'
+
 # for real-time database
 import pyrebase
 
