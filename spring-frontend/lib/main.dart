@@ -61,7 +61,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
         // home: LoginForm(),
-        home: SplashScreen(child: ChatApp())
+        home: SplashScreen(child: LoginPage())
     );
   }
 }

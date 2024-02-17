@@ -3,11 +3,9 @@ import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-void main() {
-  runApp(ChatApp());
-}
-
 class ChatApp extends StatelessWidget {
+  const ChatApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return AdaptiveTheme(
@@ -30,6 +28,8 @@ class ChatApp extends StatelessWidget {
 }
 
 class ChatScreen extends StatefulWidget {
+  const ChatScreen({super.key});
+
   @override
   _ChatScreenState createState() => _ChatScreenState();
 }
@@ -46,8 +46,8 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _addInitialMessages() {
-    _messages.add(ChatMessage(text: "Hello there!", isMe: false));
-    _messages.add(ChatMessage(text: "Hi! How can I help you?", isMe: true));
+    _messages.add(const ChatMessage(text: "Hello there!", isMe: false));
+    _messages.add(const ChatMessage(text: "Hi! How can I help you?", isMe: true));
   }
 
   void _handleSubmitted(String text) {
@@ -158,7 +158,7 @@ class ChatMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final ThemeData themeData = Theme.of(context);
+    // final ThemeData themeData = Theme.of(context);
     const double radius = 10.0;
 
     Color? backgroundColor = isMe
@@ -173,15 +173,6 @@ class ChatMessage extends StatelessWidget {
             isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          // if (!isMe) ...[
-          //   Container(
-          //     margin: const EdgeInsets.only(right: 16.0),
-          //     child: const CircleAvatar(
-          //       backgroundColor: Color(0xFF1976D2),
-          //       child: Text('A'),
-          //     ),
-          //   ),
-          // ],
           Flexible(
             child: Container(
               padding: const EdgeInsets.all(12.0),
