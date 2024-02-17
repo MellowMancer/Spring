@@ -1,20 +1,21 @@
 from flask import Flask, render_template, request, redirect, url_for
 from google.cloud.firestore_v1 import FieldFilter
 from functools import wraps
-from config import auth, db, firebase_admin, session, app
+from config import authenticator, db, session, app, auth
 
 def authenticate_user(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         # try:
-        #     a=auth.get_account_info(session['idToken'])
-        #     print('Returning fn')
-        #     return f(*args, **kwargs)
-        # except:
+        #     a=authenticator.get_account_info(session['idToken'])
+        #     print(a)
         #     if 'user' in session:
-        #         print('Deleting user')
-        #         ref=db.collection('users').document(session['localId']).delete()
-        #         session.clear()
+        #         print('Returning fn')
+        #         return f(*args, **kwargs)
+        # except:
+        #     print('Deleting user')
+        #     ref=db.collection('users').document(session['localId']).delete()
+        #     session.clear()
         if 'user' in session:
             return f(*args, **kwargs)
 
@@ -36,8 +37,8 @@ def login():
         email=request.form['email']
         password=request.form['password']
         try:
-            user=auth.sign_in_with_email_and_password(email,password)
-            a=auth.get_account_info(user['idToken'])
+            user=authenticator.sign_in_with_email_and_password(email,password)
+            a=authenticator.get_account_info(user['idToken'])
             print('login')
             print(a)
             if a['users'][0]['emailVerified']==False:
@@ -69,8 +70,8 @@ def signup():
         email=request.form['email']
         password=request.form['password']
         try:
-            user=auth.create_user_with_email_and_password(email,password)
-            auth.send_email_verification(user['idToken'])
+            user=authenticator.create_user_with_email_and_password(email,password)
+            authenticator.send_email_verification(user['idToken'])
             # user=auth.sign_in_with_email_and_password(email,password)
             session['username']=name
             # print(user)
@@ -87,7 +88,7 @@ def signup():
 def forgot_password():
     email=request.args.get('email')
     if 'user' not in session:
-        auth.send_password_reset_email(email)
+        authenticator.send_password_reset_email(email)
         return 'Password reset email sent'
     else:
         return 'You are already logged in'
@@ -95,10 +96,10 @@ def forgot_password():
 @app.route('/profile')
 @authenticate_user
 def profile():
-    # data=db.collection('users').document(session['localId']).get()
-    # data=data.to_dict()
-    # print(data)
-    return render_template('profile.html')
+    data=db.collection('users').document(session['localId']).get()
+    data=data.to_dict()
+    print(data)
+    # return render_template('profile.html')
     return render_template('profile.html', name=data['name'], email=data['email'])
 
 @app.route('/logout')
@@ -110,8 +111,9 @@ def logout():
 @app.route('/delete-user')
 @authenticate_user
 def delete_user():
-    auth.delete_user(session['idToken'])
-    # ref=db.collection('users').document(session['localId']).delete()
+    auth.delete_user(session['localId'])
+    print('Deleted user')
+    ref=db.collection('users').document(session['localId']).delete()
     session.clear()
     return redirect('/login')
 

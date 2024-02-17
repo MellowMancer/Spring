@@ -18,6 +18,14 @@ from langchain.prompts import (
     MessagesPlaceholder
 )
 
+import spacy
+nlp=spacy.load('en_core_web_sm')
+import nltk
+nltk.download('vader_lexicon')
+from nltk.sentiment.vader import SentimentIntensityAnalyzer
+sid=SentimentIntensityAnalyzer()
+from datetime import datetime
+
 import utils
 
 
@@ -152,7 +160,19 @@ def responseMessage():
         return jsonify({"response": response}), 200
 
     return jsonify({"response": "Sorry but there was an error in generating a message"}), 200
+
+def sentiment():
+    # add diary entry
+    # ref=db.collection('users').document(user['localId'])
+    # d=ref.collection('diary').document()
+    # d.set({'date': str(datetime.now().date()), 'content': 'I am feeling good today'})
+    # print(d.id)
     
+    #fetch diary entry
+    d=ref.collection('diary').document(d.id).get()
+    content=d.get('content')
+    print(sid.polarity_scores(content))
+        
 
 if __name__ == '__main__':
     # app.run(debug=True)
