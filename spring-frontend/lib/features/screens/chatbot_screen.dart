@@ -1,34 +1,37 @@
 import 'package:flutter/material.dart';
-import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-class ChatApp extends StatelessWidget {
-  const ChatApp({super.key});
+// class ChatApp extends StatelessWidget {
+//   const ChatApp({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return AdaptiveTheme(
-      light: ThemeData(
-        primaryColor: Colors.blue,
-        fontFamily: 'Roboto',
-        colorScheme:
-            ColorScheme.fromSwatch().copyWith(secondary: Colors.blueAccent),
-      ),
-      dark: ThemeData.dark(),
-      initial: AdaptiveThemeMode.light,
-      builder: (theme, darkTheme) => MaterialApp(
-        title: 'Chat App',
-        theme: theme,
-        darkTheme: darkTheme,
-        home: ChatScreen(),
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     final ColorScheme colorScheme = Theme.of(context).colorScheme;
+//     return AdaptiveTheme(
+//       light: ThemeData(
+//         primaryColor: colorScheme.primary,
+//         fontFamily: 'Roboto',
+//         colorScheme: colorScheme,
+//       ),
+//       dark: ThemeData.dark(),
+//       initial: AdaptiveThemeMode.light,
+//       builder: (theme, darkTheme) => MaterialApp(
+//         title: 'Chat App',
+//         theme: theme,
+//         darkTheme: darkTheme,
+//         home: ChatScreen(),
+//       ),
+//     );
+//   }
+// }
 
 class ChatScreen extends StatefulWidget {
+  // ColorScheme colorScheme = colorScheme;
+  
   const ChatScreen({super.key});
+
+  static const String routeName = '/chatbot';
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
@@ -46,8 +49,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _addInitialMessages() {
-    _messages.add(const ChatMessage(text: "Hello there!", isMe: false));
-    _messages.add(const ChatMessage(text: "Hi! How can I help you?", isMe: true));
+    _messages.add(const ChatMessage(text: "Hello there I am Springy! You can talk to me about anything. All of our chats will be deleted when you leave to maintain the maximum privacy", isMe: false));
   }
 
   void _handleSubmitted(String text) {
@@ -85,13 +87,18 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       appBar: AppBar(
           leading: IconButton(
               onPressed: () => Navigator.of(context, rootNavigator: true).pop(context),
-              icon: const Icon(Icons.arrow_back)),
-          title: Text("Chat With Springy", style: Theme.of(context).textTheme.headlineSmall),
+              icon: const Icon(Icons.arrow_back), color: Colors.white),
+          title: const Text("Chat", style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white)),
           centerTitle: true,
+          backgroundColor: colorScheme.primary,
         ),
       body: Column(
         children: <Widget>[
@@ -106,7 +113,7 @@ class _ChatScreenState extends State<ChatScreen> {
           _buildTextComposer(),
         ],
       ),
-    );
+  );
   }
 
   Widget _buildTextComposer() {
@@ -158,14 +165,13 @@ class ChatMessage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final ThemeData themeData = Theme.of(context);
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
     const double radius = 10.0;
 
     Color? backgroundColor = isMe
-        ? const Color(0xFF2196F3)
+        ? colorScheme.primary
         : const Color.fromARGB(255, 255, 255, 255);
     Color textColor = isMe ? Colors.white : Colors.black;
-
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 10.0),
       child: Row(

@@ -53,6 +53,7 @@ class MyApp extends StatelessWidget {
           '/login': (context) => LoginPage(),
           '/home': (context) => HomePage(),
           '/signup': (context) => SignUpPage(),
+          '/chatbot': (context) => ChatScreen(),
         },
 
         theme: ThemeData.from(colorScheme: colorScheme),

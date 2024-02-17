@@ -3,7 +3,7 @@ import 'package:spring/features/screens/home_page.dart';
 import 'package:spring/features/screens/pet_page.dart';
 import 'package:spring/features/screens/profile_page.dart';
 import 'package:spring/features/screens/trivia_page.dart';
-import 'package:spring/chatbot_screen.dart';
+import 'package:spring/features/screens/chatbot_screen.dart';
 
 class BottomNavBar extends StatefulWidget {
   const BottomNavBar({super.key});
@@ -31,11 +31,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => ChatApp()),
-          );
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const ChatScreen()));
         },
         backgroundColor: colorScheme.primary,
         child: const Icon(Icons.chat),
