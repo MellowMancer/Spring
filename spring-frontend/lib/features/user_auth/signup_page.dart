@@ -136,7 +136,8 @@ class _SignUpPageState extends State<SignUpPage> {
           },
         );
         return false;
-      } else if (e.code == 'email-already-in-use') {
+      } 
+      else if (e.code == 'email-already-in-use') {
         showDialog(
           context: context,
           builder: (BuildContext context) {

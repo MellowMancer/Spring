@@ -91,8 +91,8 @@ class _LoginPageState extends State<LoginPage> {
     // if (response.statusCode == 200) {
     //   return true;
     // } else {
-    //   var responseJson = json.decode(response.body);
-    //   var errorMessage = responseJson['error'];
+    //   // var responseJson = json.decode(response.body);
+    //   // var errorMessage = responseJson['error'];
     //   // ignore: use_build_context_synchronously
     //   showDialog(
     //     context: context,
