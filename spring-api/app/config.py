@@ -18,11 +18,11 @@ config={
 }
 
 firebase=pyrebase.initialize_app(config)
-auth=firebase.auth()
+authenticator=firebase.auth()
 
 # for firestore
 import firebase_admin
-from firebase_admin import credentials, firestore
+from firebase_admin import credentials, firestore, auth
 
 cred = credentials.Certificate("spring-api\spring-a-ling-firebase-adminsdk-u83lc-a9820c5450.json")
 firebase_admin.initialize_app(cred)
