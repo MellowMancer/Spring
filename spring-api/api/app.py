@@ -49,7 +49,7 @@ auth=firebase.auth()
 
 
 
-cred = credentials.Certificate("spring-api\spring-a-ling-firebase-adminsdk-u83lc-a9820c5450.json")
+cred = credentials.Certificate("spring-a-ling-firebase-adminsdk-u83lc-a9820c5450.json")
 firebase_admin.initialize_app(cred)
 db=firestore.client()
 

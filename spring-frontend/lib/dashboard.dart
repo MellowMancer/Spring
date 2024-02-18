@@ -32,7 +32,7 @@ class _DashboardState extends State<Dashboard> {
       theme: _darkMode ? ThemeData.dark() : ThemeData.light(),
       home: Scaffold(
         appBar: AppBar(
-          title: const Text('My Dashboard'),
+          title: const Text('Homepage'),
           actions: [
             Switch(
               value: _darkMode,
