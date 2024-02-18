@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:spring/features/screens/profile/edit_email_password.dart';
 import 'package:spring/features/screens/profile_page.dart';
+import 'package:spring/features/widgets/bottom_navigation_bar.dart';
 import 'package:spring/features/widgets/form_container_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -175,7 +176,7 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                             Navigator.pushAndRemoveUntil(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => const ProfilePage()),
+                                    builder: (context) => const BottomNavBar()),
                                 (Route<dynamic> route) => false);
                           }
                         }

@@ -27,7 +27,7 @@ class ProfileMenuWidget extends StatelessWidget {
           borderRadius: BorderRadius.circular(100),
           color: const Color.fromARGB(255, 198, 198, 198).withOpacity(0.1),
         ),
-        child: Icon(icon, color: Colors.grey.withOpacity(0.5)),
+        child: Icon(icon, color: Color.fromARGB(255, 150, 0, 150)),
       ),
       title: Text(title, style: Theme.of(context).textTheme.bodyLarge),
       trailing: endIcon

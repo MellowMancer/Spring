@@ -44,15 +44,14 @@ class _LoginPageState extends State<LoginPage> {
     final String email = emailController.text;
     final String password = passwordController.text;
 
-    await FirebaseAuth.instance.signInWithEmailAndPassword(
+    try{
+      await FirebaseAuth.instance.signInWithEmailAndPassword(
       email: email,
-      password: password,
+      password: password, 
     );
-
-    if (FirebaseAuth.instance.currentUser != null) {
-      return true;
-    } 
-    else {
+    return true;
+    }
+    on FirebaseAuthException catch (e) {
       // ignore: use_build_context_synchronously
       showDialog(
          context: context,
