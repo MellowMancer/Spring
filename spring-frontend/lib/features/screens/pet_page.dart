@@ -11,6 +11,50 @@ class PetPage extends StatefulWidget {
 }
 
 class _PetPageState extends State<PetPage> {
+  final List<Map<String, dynamic>> tasks = [
+    {
+      'icon': Icons.pets,
+      'title': 'Play with your pet',
+      'description': 'Play with your pet by rubbing your finger on them!',
+      'completed': false
+    },
+    {
+      'icon': Icons.person,
+      'title': 'Meditate for 30 minutes',
+      'description': 'Ease your mind and relax to refresh your day!',
+      'completed': true
+    },
+    {
+      'icon': Icons.local_fire_department,
+      'title': 'Exercise for 30 minutes',
+      'description': 'Get your body moving and your heart pumping!',
+      'completed': false
+    },
+    {
+      'icon': Icons.handshake,
+      'title': 'Perform 3 acts of kindness',
+      'description': 'Perform acts of kindness to make someone smile!',
+      'completed': false
+    },
+    {
+      'icon': Icons.star,
+      'title': 'Note 3 events you are grateful for',
+      'description': 'Write down 3 events that made you happy today!',
+      'completed': false
+    },
+    {
+      'icon': Icons.bookmark,
+      'title': 'Read a book for 30 minutes',
+      'description': 'Read a book to relax and escape into a different world!',
+      'completed': false
+    },
+    {
+      'icon': Icons.bedtime,
+      'title': 'Sleep for  8 hours', 
+      'description': 'Get a good night\'s sleep to refresh your mind and body!',
+      'completed': false
+    },
+  ];
   final assetList = [
     'assets/images/pets/cat/cat_default.gif',
     'assets/images/pets/cat/cat_happy.gif',
@@ -37,10 +81,6 @@ class _PetPageState extends State<PetPage> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // const Text('Pet Page',
-                  //     style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
-                  // const SizedBox(height: 30),
-                  // Image.asset('assets/images/pets/cat/cat_happy.gif'),
                   GifView.asset(
                     assetList[index],
                     height: 200,
@@ -51,68 +91,75 @@ class _PetPageState extends State<PetPage> {
                   const Text('Melfie', style: TextStyle(fontSize: 18)),
                   const Divider(),
                   const SizedBox(height: 20),
-                  Text('2 Goals Completed Today!', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: colorScheme.primary), ),
-                  SizedBox(height: 10),
+                  Text(
+                    '2 Goals Completed Today!',
+                    style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: colorScheme.primary),
+                  ),
+                  const SizedBox(height: 10),
                   Padding(
                     padding: const EdgeInsets.all(10),
-                    child:
-                        Material(
-                            color: Colors.white,
-                            elevation:  5, // Add elevation
-                            borderRadius: BorderRadius.circular(10), // Optional: for rounded corners
-                            child: Card(
-                            elevation: 0, // Remove shadow
-                            margin: const EdgeInsets.all(0), // Remove margin
-                            child: Column(
-                              children: [
-                                const ListTile(
-                                  leading: Icon(Icons.pets),
-                                  title: Text('Play with your pet!'),
-                                  trailing:
-                                      Icon(Icons.favorite_border, color: Colors.grey),
-                                ),
-                                Divider(color: colorScheme.primaryContainer),
-                                const ListTile(
-                                  leading: Icon(Icons.person),
-                                  title: Text('Meditate for 30 minutes'),
-                                  trailing: Icon(Icons.favorite, color: Colors.red),
-                                ),
-                                Divider(color: colorScheme.primaryContainer),
-                                const ListTile(
-                                  leading: Icon(Icons.local_fire_department),
-                                  title: Text('Exercise for 30 minutes'),
-                                  trailing:
-                                      Icon(Icons.favorite_border, color: Colors.grey),
-                                ),
-                                Divider(color: colorScheme.primaryContainer),
-                                const ListTile(
-                                  leading: Icon(Icons.handshake),
-                                  title: Text('Perform 3 acts of kindness'),
-                                  trailing:
-                                      Icon(Icons.favorite_border, color: Colors.grey),
-                                ),
-                                Divider(color: colorScheme.primaryContainer),
-                                const ListTile(
-                                  leading: Icon(Icons.local_fire_department),
-                                  title: Text('Exercise for 30 minutes'),
-                                  trailing:
-                                      Icon(Icons.favorite_border, color: Colors.grey),
-                                ),
-                                Divider(color: colorScheme.primaryContainer),
-                                const ListTile(
-                                  leading: Icon(Icons.local_fire_department),
-                                  title: Text('Exercise for 30 minutes'),
-                                  trailing:
-                                      Icon(Icons.favorite_border, color: Colors.grey),
-                                ),
-                              ],
-                            ),
-                          ),
+                    child: Material(
+                      color: Colors.white,
+                      elevation: 5,
+                      borderRadius: BorderRadius.circular(10),
+                      child: Card(
+                        elevation: 0,
+                        margin: const EdgeInsets.all(0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: tasks.map((task) {
+                            return ListTile(
+                              leading: Icon(task['icon'],
+                                  color: task['completed']
+                                      ? Colors.red
+                                      : Colors.grey),
+                              title: Text(
+                                task['title'],
+                                textAlign: TextAlign.start,
+                              ),
+                              trailing: Icon(
+                                  task['completed']
+                                      ? Icons.favorite
+                                      : Icons.favorite_border,
+                                  color: task['completed']
+                                      ? Colors.red
+                                      : Colors.grey),
+                            );
+                          }).toList(),
                         ),
+                      ),
                     ),
-                  ],
-                ),
+                  ),
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 1,
+                    ),
+                    itemCount: tasks.length,
+                    itemBuilder: (context, index) {
+                      final task = tasks[index];
+                      return Card(
+                        color: colorScheme.primaryContainer,
+                        elevation: 5,
+                        child: ListTile(
+                          isThreeLine: true,
+                          title: Text(task['title'], style: TextStyle(color: colorScheme.onPrimaryContainer, fontWeight: FontWeight.bold, fontSize: 18)),
+                          subtitle: Text(task['description']),
+                          onTap: () {
+                            // Handle task tap, e.g., navigate to task details
+                          },
+                        ),
+                      );
+                    },
+                  ),
+                ],
               ),
+            ),
           ),
         ),
       ),
