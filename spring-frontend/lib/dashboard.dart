@@ -206,7 +206,6 @@ class MoodTrackingScreen extends StatelessWidget {
         _showSelectedMoodDialog(context, emoji, label);
       },
       style: ElevatedButton.styleFrom(
-        primary: color,
         shape: CircleBorder(),
         padding: EdgeInsets.all(24),
       ),

@@ -58,8 +58,10 @@ class _TriviaPageState extends State<TriviaPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
+    return MaterialApp(
+        theme: ThemeData.light(),
+        home: Scaffold(
+        appBar: AppBar(
         title: Container(
           width: double.infinity,
           height:   40,
@@ -95,6 +97,7 @@ class _TriviaPageState extends State<TriviaPage> {
           );
         },
       ),
+    ),
     );
   }
 

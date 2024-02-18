@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   static const String routeName = '/homepage';
 
@@ -27,52 +27,57 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Home'),
-        centerTitle: true, // Center the title
-      ),
+    final ColorScheme colorScheme = Theme.of(context).colorScheme;
+    return MaterialApp(
+        theme: ThemeData.light(),
+        home: Scaffold(
+          appBar: AppBar(
+            title: Text("Home",
+                style: Theme.of(context).textTheme.headlineSmall),
+            centerTitle: true,
+          ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Welcome to the Home Page'),
-            SizedBox(height:   30),
-            Text(
+            const Text('Welcome to the Home Page'),
+            const SizedBox(height:   30),
+            const Text(
               'What is your mood today?',
               style: TextStyle(fontSize:   20, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height:   10),
+            const SizedBox(height:   10),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton.icon(
                   onPressed: () => _selectMood(0),
-                  icon: Icon(Icons.sentiment_very_satisfied),
-                  label: Text('Happy'),
+                  icon: const Icon(Icons.sentiment_very_satisfied),
+                  label: const Text('Happy'),
                   style: ElevatedButton.styleFrom(
-                    primary: _selectedMood ==   0 ? Colors.green : Colors.blue,
+                    backgroundColor: colorScheme.primaryContainer,
+                    foregroundColor: _selectedMood ==   0 ? colorScheme.primary : colorScheme.onPrimaryContainer,
                   ),
                 ),
                 ElevatedButton.icon(
                   onPressed: () => _selectMood(1),
-                  icon: Icon(Icons.sentiment_neutral),
-                  label: Text('Neutral'),
+                  icon: const Icon(Icons.sentiment_neutral),
+                  label: const Text('Neutral'),
                   style: ElevatedButton.styleFrom(
-                    primary: _selectedMood ==   1 ? Colors.green : Colors.blue,
-                  ),
+                    backgroundColor: colorScheme.primaryContainer,
+                    foregroundColor: _selectedMood ==   1 ? colorScheme.primary : colorScheme.onPrimaryContainer,),
                 ),
                 ElevatedButton.icon(
                   onPressed: () => _selectMood(2),
-                  icon: Icon(Icons.sentiment_very_dissatisfied),
-                  label: Text('Sad'),
+                  icon: const Icon(Icons.sentiment_very_dissatisfied),
+                  label: const Text('Sad'),
                   style: ElevatedButton.styleFrom(
-                    primary: _selectedMood ==   2 ? Colors.green : Colors.blue,
-                  ),
+                    backgroundColor: colorScheme.primaryContainer,
+                    foregroundColor: _selectedMood ==   2 ? colorScheme.primary : colorScheme.onPrimaryContainer,),
                 ),
               ],
             ),
-            SizedBox(height:   30),
+            const SizedBox(height:   30),
             ...List.generate(4, (index) {
               String buttonText;
               String description;
@@ -105,42 +110,47 @@ class _HomePageState extends State<HomePage> {
               }
               // Wrap the button with a SizedBox to give it a fixed size
               return SizedBox(
-                width: MediaQuery.of(context).size.width *   0.9, //   90% of screen width
+                width: MediaQuery.of(context).size.width * 0.9, // 90% of screen width
                 child: ElevatedButton.icon(
                   onPressed: () => _openNewWindow(context),
                   icon: Icon(buttonIcon),
                   label: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start, // Aligns children to the start (left)
                     children: [
                       Text(
                         buttonText,
-                        style: TextStyle(fontSize:   18, fontWeight: FontWeight.bold),
+                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.left,
                       ),
                       Text(
                         description,
-                        style: TextStyle(fontSize:   12),
+                        style: const TextStyle(fontSize: 12),
+                        textAlign: TextAlign.left,
                       ),
                     ],
                   ),
                   style: ElevatedButton.styleFrom(
-                    primary: Colors.blue,
-                    onPrimary: Colors.white,
+                    foregroundColor: colorScheme.onPrimaryContainer, backgroundColor: colorScheme.primaryContainer,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(5),
                     ),
-                    padding: EdgeInsets.symmetric(horizontal:   20),
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    alignment: Alignment.centerLeft,
                   ),
                 ),
               );
-            }).expand((button) => [button, SizedBox(height:   10)]).toList(),
+            }).expand((button) => [button, const SizedBox(height:   10)]),
           ],
         ),
       ),
+    ),
     );
   }
 }
 
 class NewWindow extends StatelessWidget {
+  const NewWindow({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
