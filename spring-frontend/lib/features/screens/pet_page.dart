@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gif_view/gif_view.dart';
+import 'package:spring/features/screens/daily_tasks/walk_page.dart';
 
 class PetPage extends StatefulWidget {
   const PetPage({super.key});
@@ -52,6 +53,12 @@ class _PetPageState extends State<PetPage> {
       'icon': Icons.bedtime,
       'title': 'Sleep for  8 hours', 
       'description': 'Get a good night\'s sleep to refresh your mind and body!',
+      'completed': false
+    },
+    {
+      'icon': Icons.directions_walk,
+      'title': 'Walk 500 steps',
+      'description': 'Get up and walk around to get your body moving!',
       'completed': false
     },
   ];
@@ -151,7 +158,9 @@ class _PetPageState extends State<PetPage> {
                           title: Text(task['title'], style: TextStyle(color: colorScheme.onPrimaryContainer, fontWeight: FontWeight.bold, fontSize: 18)),
                           subtitle: Text(task['description']),
                           onTap: () {
-                            // Handle task tap, e.g., navigate to task details
+                            if (task['title'] == 'Walk 500 steps') {
+                              Navigator.push(context, MaterialPageRoute(builder: (context) => const WalkPage()));
+                            }
                           },
                         ),
                       );
