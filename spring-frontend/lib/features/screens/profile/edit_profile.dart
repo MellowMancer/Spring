@@ -145,7 +145,6 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                       isPasswordField: false,
                       validator: _validateDisplayName,
                     ),
-                    const SizedBox(height: 30),
                      Row(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
@@ -164,7 +163,6 @@ class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
                             ),
                           ],
                         ),
-                    const SizedBox(height: 30),
                     ElevatedButton(
                       onPressed: () async {
                         if (_editProfileKey.currentState!.validate()) {

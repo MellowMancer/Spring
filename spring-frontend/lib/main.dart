@@ -6,7 +6,7 @@ import 'package:spring/features/app/splashscreen/splashscreen.dart';
 import 'package:spring/features/user_auth/login_page.dart';
 import 'package:spring/features/screens/home_page.dart';
 import 'package:spring/features/user_auth/signup_page.dart';
-import 'package:spring/chatbot_screen.dart';
+import 'package:spring/features/screens/chatbot_screen.dart';
 
 // import 'src/app.dart';
 import 'src/settings/settings_controller.dart';
@@ -49,12 +49,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
 
-        routes: {
-          '/login': (context) => LoginPage(),
-          '/home': (context) => HomePage(),
-          '/signup': (context) => SignUpPage(),
-          '/chatbot': (context) => ChatScreen(),
-        },
+        // routes: {
+        //   '/login': (context) => LoginPage(),
+        //   '/home': (context) => HomePage(),
+        //   '/signup': (context) => SignUpPage(),
+        //   '/chatbot': (context) => ChatScreen(),
+        // },
 
         theme: ThemeData.from(colorScheme: colorScheme),
         

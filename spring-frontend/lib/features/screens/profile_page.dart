@@ -16,19 +16,23 @@ class ProfilePage extends StatefulWidget {
 }
 
 class _ProfilePageState extends State<ProfilePage> {
-  String _name = "Hllo";
-  String _displayName = "Hello";
+  String _name = "";
+  String _displayName = "";
 
   Future<void> _getUserData() async {
     final user = FirebaseAuth.instance.currentUser;
-    final userData = await FirebaseFirestore.instance
-        .collection('users')
-        .doc(user?.uid)
-        .get();
-    setState(() {
-      _name = userData['name'];
-      _displayName = userData['displayName'];
-    });
+    if (user != null) {
+      final userData = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+      if (mounted) {
+        setState(() {
+          _name = userData['name'];
+          _displayName = userData['displayName'];
+        });
+      }
+    }
   }
 
   @override
@@ -94,35 +98,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   const SizedBox(height: 30),
                   const Divider(),
                   const SizedBox(height: 10),
-
-                  /// -- MENU
-                  // ProfileMenuWidget(
-                  //     title: "Settings",
-                  //     icon: Icons.settings,
-                  //     onPress: () {Get.defaultDialog(
-                  //         title: "LOGOUT",
-                  //         titleStyle: const TextStyle(fontSize: 20),
-                  //         content: const Padding(
-                  //           padding: EdgeInsets.symmetric(vertical: 15.0),
-                  //           child: Text("Are you sure, you want to Logout?"),
-                  //         ),
-                  //         confirm: Expanded(
-                  //           child: ElevatedButton(
-                  //             onPressed: () =>
-                  //                 "Logout Functionality goes here...",
-                  //             style: ElevatedButton.styleFrom(
-                  //                 backgroundColor: Colors.redAccent,
-                  //                 side: BorderSide.none),
-                  //             child: const Text("Yes"),
-                  //           ),
-                  //         ),
-                  //         cancel: OutlinedButton(
-                  //             onPressed: () => Get.back(),
-                  //             child: const Text("No")),
-                  //       );
-                  //     }),
-                  // const Divider(),
-                  // const SizedBox(height: 10),
                   ProfileMenuWidget(
                       title: "Logout",
                       icon: const IconData(0xf88b, fontFamily: 'MaterialIcons'),

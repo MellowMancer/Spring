@@ -49,7 +49,7 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   void _addInitialMessages() {
-    _messages.add(const ChatMessage(text: "Hello there I am Springy! You can talk to me about anything. All of our chats will be deleted when you leave to maintain the maximum privacy", isMe: false));
+    _messages.add(const ChatMessage(text: "Hello there I am Springy! You can talk to me about anything. None of our chats are saved to maintain maximum privacy", isMe: false));
   }
 
   void _handleSubmitted(String text) {
@@ -88,10 +88,12 @@ class _ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    return Scaffold(
+    return MaterialApp(
+        theme: ThemeData.light(),
+        home: Scaffold(
       appBar: AppBar(
           leading: IconButton(
-              onPressed: () => Navigator.of(context, rootNavigator: true).pop(context),
+              onPressed: () => Navigator.of(context).pop(context),
               icon: const Icon(Icons.arrow_back), color: Colors.white),
           title: const Text("Chat", style: TextStyle(
                     fontSize: 24,
@@ -113,6 +115,7 @@ class _ChatScreenState extends State<ChatScreen> {
           _buildTextComposer(),
         ],
       ),
+    )
   );
   }
 

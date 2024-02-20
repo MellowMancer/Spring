@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:spring/features/screens/profile/edit_profile.dart';
 import 'package:spring/features/screens/profile_page.dart';
+import 'package:spring/features/widgets/bottom_navigation_bar.dart';
 import 'package:spring/features/widgets/form_container_widget.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -40,7 +41,8 @@ class _UpdateEmailPasswordScreenState extends State<UpdateEmailPasswordScreen> {
   }
 
   String? _validateConfirmPassword(String? value) {
-    if (value == null || value.isEmpty && newPasswordController.text.isNotEmpty) {
+    if (value == null ||
+        value.isEmpty && newPasswordController.text.isNotEmpty) {
       return 'Please confirm your new password';
     }
     if (value != newPasswordController.text) {
@@ -73,6 +75,7 @@ class _UpdateEmailPasswordScreenState extends State<UpdateEmailPasswordScreen> {
     final String newPassword = newPasswordController.text;
     final String confirmPassword = confirmPasswordController.text;
     final user = FirebaseAuth.instance.currentUser!;
+    bool isEmailVerified = false;
 
     try {
       if (email != user.email) {
@@ -83,8 +86,7 @@ class _UpdateEmailPasswordScreenState extends State<UpdateEmailPasswordScreen> {
             password: oldPassword,
           );
           await user.reauthenticateWithCredential(credential);
-          // User has been successfully reauthenticated
-
+          await user.verifyBeforeUpdateEmail(email);
           // ignore: use_build_context_synchronously
           showDialog(
             context: context,
@@ -94,7 +96,8 @@ class _UpdateEmailPasswordScreenState extends State<UpdateEmailPasswordScreen> {
                 content: SingleChildScrollView(
                   child: ListBody(
                     children: <Widget>[
-                      Text('A verification email has been sent to $email to change your email address'), 
+                      Text(
+                          'A verification email has been sent to $email to change your email address'),
                     ],
                   ),
                 ),
@@ -102,17 +105,29 @@ class _UpdateEmailPasswordScreenState extends State<UpdateEmailPasswordScreen> {
                   TextButton(
                     child: const Text('OK'),
                     onPressed: () {
-                      Navigator.of(context).pop();
+                      setState(() {
+                            isEmailVerified = FirebaseAuth
+                                .instance.currentUser!.emailVerified;
+                          });
+
+                          if (isEmailVerified) {
+                            // ignore: use_build_context_synchronously
+                            Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => const BottomNavBar()),
+                                (Route<dynamic> route) => false);
+                          }
+                      // Navigator.of(context).pop();
                     },
                   ),
                 ],
               );
             },
           );
-          await user.verifyBeforeUpdateEmail(email);
         }
       }
-      if(newPassword.isNotEmpty){
+      if (newPassword.isNotEmpty) {
         final user = FirebaseAuth.instance.currentUser!;
           final credential = EmailAuthProvider.credential(
             email: user.email!,
@@ -213,38 +228,31 @@ class _UpdateEmailPasswordScreenState extends State<UpdateEmailPasswordScreen> {
                       isPasswordField: true,
                       validator: _validateConfirmPassword,
                     ),
-                     Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pushReplacement(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => const UpdateProfileScreen()),
-                                );
-                              },
-                              child: Text(
-                                'Already have an account?',
-                                style: TextStyle(color: colorScheme.primary),
-                              ),
-                            ),
-                          ],
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      const UpdateProfileScreen()),
+                            );
+                          },
+                          child: Text(
+                            'Update Name or Display Name?',
+                            style: TextStyle(color: colorScheme.primary),
+                          ),
                         ),
-                    const SizedBox(height: 30),
+                      ],
+                    ),
                     ElevatedButton(
                       onPressed: () async {
                         if (_editProfileKey.currentState!.validate()) {
                           // All fields are valid, proceed with editProfile
                           bool isValid = await editProfile();
-                          if (isValid) {
-                            // ignore: use_build_context_synchronously
-                            Navigator.pushAndRemoveUntil(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => const ProfilePage()),
-                                (Route<dynamic> route) => false);
-                          }
+                          
                         }
                       },
                       style: ElevatedButton.styleFrom(
