@@ -43,7 +43,7 @@ class MyApp extends StatelessWidget {
   MyApp({super.key, required this.settingsController});
 
   final SettingsController settingsController;
-  final ColorScheme colorScheme = ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 132, 0, 255));
+  final ColorScheme colorScheme = ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 224, 132, 255));
 
   @override
   Widget build(BuildContext context) {

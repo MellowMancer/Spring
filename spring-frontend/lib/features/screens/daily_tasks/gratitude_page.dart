@@ -92,7 +92,7 @@ class _GratitudePageState extends State<GratitudePage> {
                 children: [
                   const SizedBox(height: 20),
                   Text('Practice positive thinking by shifting our focus from what we lack to what we have. Write down 3 events that made you happy today!',
-                      style: TextStyle(fontSize: 18, color: colorScheme.primary, fontWeight: FontWeight.bold)),
+                      style: TextStyle(fontSize: 16, color: colorScheme.primary, fontWeight: FontWeight.bold)),
                   const SizedBox(height: 20),
                   TextFormField(
                     controller: gratitude1Controller,
