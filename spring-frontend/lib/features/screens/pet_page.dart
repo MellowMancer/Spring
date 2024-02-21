@@ -3,6 +3,7 @@ import 'package:gif_view/gif_view.dart';
 import 'package:spring/features/screens/daily_tasks/gratitude_page.dart';
 import 'package:spring/features/screens/daily_tasks/walk_page.dart';
 import 'package:spring/features/screens/daily_tasks/kindness_page.dart';
+import 'package:spring/features/screens/daily_tasks/exercise_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:spring/features/screens/daily_tasks/hobby_page.dart';
@@ -34,7 +35,7 @@ class _PetPageState extends State<PetPage> {
       'icon': Icons.local_fire_department,
       'title': 'Exercise for 30 minutes',
       'description': 'Get your body moving and your heart pumping!',
-      'navigateTo': WalkPage()
+      'navigateTo': ExercisePage()
     },
     {
       'icon': Icons.handshake,

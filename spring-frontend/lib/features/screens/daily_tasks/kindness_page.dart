@@ -95,7 +95,7 @@ class _KindnessPageState extends State<KindnessPage> {
                   Text(
                       "Bring a smile to other people's faces by performing acts of kindness. You can do this by helping someone in need, giving a compliment, or simply being there for someone who needs you.",
                       style: TextStyle(
-                          fontSize: 18,
+                          fontSize: 16,
                           color: colorScheme.primary,
                           fontWeight: FontWeight.bold)),
                   const SizedBox(height: 20),
