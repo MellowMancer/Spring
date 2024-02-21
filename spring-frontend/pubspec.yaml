@@ -32,6 +32,7 @@ dependencies:
   gif_view: ^0.3.1
   pedometer: ^4.0.1
   circular_countdown_timer: ^0.2.3
+  fl_chart: ^0.36.0
 
 dev_dependencies:
   flutter_test:

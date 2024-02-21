@@ -1,4 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:fl_chart/fl_chart.dart';
+import 'package:intl/intl.dart';
+
+void main() {
+  runApp(const MaterialApp(
+    home: HomePage(),
+  ));
+}
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -12,10 +20,26 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedMood = -1; // -1 indicates no mood selected
 
+  List<int> _moodData = [0, 0, 0, 0, 0, 0, 0]; // List to store mood data for each day of the week
+  final List<String> _days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']; // Days of the week
+
   void _selectMood(int mood) {
     setState(() {
       _selectedMood = mood;
+      _updateMoodData(); // Update mood data when mood is selected
     });
+  }
+
+  void _updateMoodData() {
+    // Update mood data based on the selected mood and current day
+    final DateTime now = DateTime.now();
+    final DateFormat formatter = DateFormat('E'); // Format to get the day of the week (e.g., Mon, Tue, etc.)
+    final String formattedDay = formatter.format(now);
+
+    int dayIndex = _days.indexOf(formattedDay);
+    if (dayIndex != -1) {
+      _moodData[dayIndex] = _selectedMood;
+    }
   }
 
   void _openWindow(BuildContext context, Widget windowContent) {
@@ -86,7 +110,7 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
             const SizedBox(height: 30),
-            ...List.generate(4, (index) {
+            ...List.generate(3, (index) {
               String buttonText;
               String description;
               IconData buttonIcon;
@@ -102,15 +126,9 @@ class _HomePageState extends State<HomePage> {
                   buttonText = 'Mood Tracking';
                   description = 'Track your mood over time';
                   buttonIcon = Icons.mood;
-                  windowContent = MoodTrackingWindow();
+                  windowContent = MoodTrackingWindow(moodData: _moodData, days: _days);
                   break;
                 case 2:
-                  buttonText = 'Gratitude Journaling';
-                  description = 'Record your gratitude';
-                  buttonIcon = Icons.edit;
-                  windowContent = GratitudeJournalingWindow();
-                  break;
-                case 3:
                   buttonText = 'Diary';
                   description = 'Write your thoughts and experiences';
                   buttonIcon = Icons.book;
@@ -173,6 +191,9 @@ class _SleepTrackingWindowState extends State<SleepTrackingWindow> {
   String _sleepQuality = '';
   String _hoursSlept = '';
 
+  // Add a list to store the data points for the graph
+  List<double> _sleepData = [];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -232,10 +253,51 @@ class _SleepTrackingWindowState extends State<SleepTrackingWindow> {
               _hoursSlept,
               style: TextStyle(fontSize: 18),
             ),
+            SizedBox(height: 20),
+            // Add the graph below the existing text widgets
+            Text(
+              'Sleep Tracking',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 10),
+            Container(
+              height: 200,
+              child: LineChart(
+                LineChartData(
+                  lineBarsData: [
+                    LineChartBarData(
+                      spots: _generateSpots(), // Generate spots for the graph
+                      isCurved: true,
+                      colors: [Colors.blue],
+                      barWidth: 4,
+                      belowBarData: BarAreaData(show: false),
+                    ),
+                  ],
+                  titlesData: FlTitlesData(
+                    leftTitles: SideTitles(showTitles: true),
+                    bottomTitles: SideTitles(showTitles: true),
+                  ),
+                  borderData: FlBorderData(show: true),
+                  minX: 0,
+                  maxX: _sleepData.length.toDouble() - 1,
+                  minY: 0,
+                  maxY: 24,
+                ),
+              ),
+            ),
           ],
         ),
       ),
     );
+  }
+
+  // Method to generate spots for the graph
+  List<FlSpot> _generateSpots() {
+    List<FlSpot> spots = [];
+    for (int i = 0; i < _sleepData.length; i++) {
+      spots.add(FlSpot(i.toDouble(), _sleepData[i]));
+    }
+    return spots;
   }
 
   Future<void> _selectTime(BuildContext context, bool isBedtime) async {
@@ -261,9 +323,10 @@ class _SleepTrackingWindowState extends State<SleepTrackingWindow> {
   void _calculateSleepQuality() {
     final bedtimeMinutes = _bedtime.hour * 60 + _bedtime.minute;
     final wakeupTimeMinutes = _wakeupTime.hour * 60 + _wakeupTime.minute;
-    final hoursSlept = ((wakeupTimeMinutes - bedtimeMinutes) / 60).round();
+    final hoursSlept = ((wakeupTimeMinutes - bedtimeMinutes) / 60).round() + 24;
 
     setState(() {
+      _sleepData.add(hoursSlept.toDouble()); // Add the hours slept to the data for the graph
       if (hoursSlept >= 7 && hoursSlept <= 9) {
         _sleepQuality = 'You slept well!';
       } else {
@@ -275,6 +338,11 @@ class _SleepTrackingWindowState extends State<SleepTrackingWindow> {
 }
 
 class MoodTrackingWindow extends StatelessWidget {
+  final List<int> moodData;
+  final List<String> days;
+
+  const MoodTrackingWindow({required this.moodData, required this.days});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -284,29 +352,58 @@ class MoodTrackingWindow extends StatelessWidget {
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            Text('Mood Tracking Window'),
-            // Add more UI elements specific to mood tracking
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class GratitudeJournalingWindow extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Gratitude Journaling Window'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            Text('Gratitude Journaling Window'),
-            // Add more UI elements specific to gratitude journaling
+          children: [
+            Text(
+              'Mood Tracking',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 20),
+            Container(
+              width: MediaQuery.of(context).size.width * 0.8,
+              height: 300,
+              child: LineChart(
+                LineChartData(
+                  lineBarsData: [
+                    LineChartBarData(
+                      spots: moodData.asMap().entries.map((entry) {
+                        return FlSpot(entry.key.toDouble(), entry.value.toDouble());
+                      }).toList(),
+                      isCurved: true,
+                      colors: [Colors.blue],
+                      barWidth: 4,
+                      isStrokeCapRound: true,
+                      belowBarData: BarAreaData(show: false),
+                    ),
+                  ],
+                  minY: 0,
+                  titlesData: FlTitlesData(
+                    leftTitles: SideTitles(showTitles: true),
+                    bottomTitles: SideTitles(
+                      showTitles: true,
+                      getTitles: (value) {
+                        if (value.toInt() >= 0 && value.toInt() < days.length) {
+                          return days[value.toInt()];
+                        }
+                        return '';
+                      },
+                      margin: 10, // Adjust the margin for better readability
+                      rotateAngle: -45, // Rotate x-axis labels for better fit
+                      interval: 1, // Specify the interval for displaying labels
+                    ),
+                  ),
+                  borderData: FlBorderData(
+                    show: true,
+                    border: Border.all(color: Colors.black),
+                  ),
+                  gridData: FlGridData(
+                    show: true,
+                    drawHorizontalLine: true,
+                    drawVerticalLine: true,
+                  ),
+                  maxX: days.length.toDouble() - 1, // Adjust maximum x value to fit all data points
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -352,10 +449,4 @@ class DefaultWindow extends StatelessWidget {
       ),
     );
   }
-}
-
-void main() {
-  runApp(const MaterialApp(
-    home: HomePage(),
-  ));
 }
