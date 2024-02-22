@@ -482,11 +482,18 @@ class _SleepTrackingWindowState extends State<SleepTrackingWindow> {
   }
 }
 
-class MoodTrackingWindow extends StatelessWidget {
+class MoodTrackingWindow extends StatefulWidget {
   final List<int> moodData;
   final List<String> days;
 
   const MoodTrackingWindow({required this.moodData, required this.days});
+
+  @override
+  _MoodTrackingWindowState createState() => _MoodTrackingWindowState();
+}
+
+class _MoodTrackingWindowState extends State<MoodTrackingWindow> {
+  String? moodGoal;
 
   @override
   Widget build(BuildContext context) {
@@ -500,40 +507,40 @@ class MoodTrackingWindow extends StatelessWidget {
           children: [
             Text(
               'Mood Tracking',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize:  24, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 20),
+            SizedBox(height:  20),
             Container(
-              width: MediaQuery.of(context).size.width * 0.8,
-              height: 300,
+              width: MediaQuery.of(context).size.width *  0.8,
+              height:  300,
               child: LineChart(
                 LineChartData(
                   lineBarsData: [
                     LineChartBarData(
-                      spots: moodData.asMap().entries.map((entry) {
+                      spots: widget.moodData.asMap().entries.map((entry) {
                         return FlSpot(entry.key.toDouble(), entry.value.toDouble());
                       }).toList(),
                       isCurved: true,
                       colors: [Colors.blue],
-                      barWidth: 4,
+                      barWidth:  4,
                       isStrokeCapRound: true,
                       belowBarData: BarAreaData(show: false),
                     ),
                   ],
-                  minY: 0,
+                  minY:  0,
                   titlesData: FlTitlesData(
                     leftTitles: SideTitles(showTitles: true),
                     bottomTitles: SideTitles(
                       showTitles: true,
                       getTitles: (value) {
-                        if (value.toInt() >= 0 && value.toInt() < days.length) {
-                          return days[value.toInt()];
+                        if (value.toInt() >=  0 && value.toInt() < widget.days.length) {
+                          return widget.days[value.toInt()];
                         }
                         return '';
                       },
-                      margin: 10, // Adjust the margin for better readability
-                      rotateAngle: -45, // Rotate x-axis labels for better fit
-                      interval: 1, // Specify the interval for displaying labels
+                      margin:  10,
+                      rotateAngle: -45,
+                      interval:  1,
                     ),
                   ),
                   borderData: FlBorderData(
@@ -545,16 +552,61 @@ class MoodTrackingWindow extends StatelessWidget {
                     drawHorizontalLine: true,
                     drawVerticalLine: true,
                   ),
-                  maxX: days.length.toDouble() - 1, // Adjust maximum x value to fit all data points
+                  maxX: widget.days.length.toDouble() -  1,
                 ),
               ),
+            ),
+            SizedBox(height:  20),
+            Text(
+              moodGoal ?? 'No mood goal set yet.',
+              textAlign: TextAlign.center,
+              style: TextStyle(fontSize:  18, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height:  20),
+            ElevatedButton(
+              onPressed: () => _showMoodGoalDialog(context),
+              child: Text('Set Mood Goal'),
             ),
           ],
         ),
       ),
     );
   }
+
+  void _showMoodGoalDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Set Mood Goal'),
+          content: TextField(
+            onChanged: (value) {
+              setState(() {
+                moodGoal = value;
+              });
+            },
+            decoration: InputDecoration(hintText: "Enter your mood goal here"),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Set'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 }
+
 
 class DiaryWindow extends StatelessWidget {
   @override
