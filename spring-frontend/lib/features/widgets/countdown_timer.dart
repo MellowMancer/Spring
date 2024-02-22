@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
-import 'dart:async';
+import 'package:audioplayers/audioplayers.dart';
+
+import 'package:flutter/services.dart';
 
 class CountdownTimer extends StatefulWidget {
   final int duration;
   final CountDownController controller;
   final String taskTitle;
   final Function? onChange;
+  final Function? onComplete;
 
   CountdownTimer({
     super.key,
@@ -16,6 +19,7 @@ class CountdownTimer extends StatefulWidget {
     required this.duration,
     required this.taskTitle,
     this.onChange,
+    this.onComplete,
   });
 
   @override
@@ -24,7 +28,7 @@ class CountdownTimer extends StatefulWidget {
 
 class CountdownTimerState extends State<CountdownTimer> {
   int currentIndex = 0;
-
+  static AudioPlayer player = new AudioPlayer();
 
   @override
   Widget build(BuildContext context) {
@@ -108,8 +112,9 @@ class CountdownTimerState extends State<CountdownTimer> {
             .doc(widget.taskTitle)
             .set({'completed': true}, SetOptions(merge: true));
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Daily Dose Of Hobby Completed!')),
+          const SnackBar(content: Text('Daily Task Completed!')),
         );
+        player.play(AssetSource('audio/simple-notification-152054.mp3'));
       },
       // This Callback will execute when the Countdown Changes.
       onChange: (String value) {

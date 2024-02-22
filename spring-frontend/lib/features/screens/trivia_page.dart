@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class TriviaPage extends StatefulWidget {
   const TriviaPage({Key? key}) : super(key: key);
@@ -11,34 +12,35 @@ class TriviaPage extends StatefulWidget {
 
 class _TriviaPageState extends State<TriviaPage> {
   final TextEditingController _searchController = TextEditingController();
-  List<String> _words = [
-    'When is a good time to wake up?',
-    'Dart',
-    'Android',
-    'iOS',
-    'React',
-    'Swift',
-    'Kotlin',
-    'Java',
-    'C#',
-    'JavaScript',
-    'Flutter',
-    
-  ];
-
-  Map<String, String> _wordInfo = {
-    'Flutter': 'Flutter is an open-source UI software development kit created by Google.',
-    'Dart': 'Dart is a programming language designed for client development, such as for the web and mobile apps.',
-    'When is a good time to wake up?':'07 am is a very good time to wake up, KINDLY START IMPLEMENTING IT AND HAVE A GOOD SLEEP SCHEDULE YATHARTH WAZIR !!'
-  };
-
+  List<String> _words = [];
+  Map<String, String> _wordInfo = {};
+  Map<String, String> _wordSource = {};
   List<String> _filteredWords = [];
 
   @override
   void initState() {
     super.initState();
-    _filteredWords = _words;
     _searchController.addListener(_onSearchChanged);
+    _fetchDataFromFirestore();
+  }
+
+  void _fetchDataFromFirestore() async {
+    QuerySnapshot querySnapshot =
+        await FirebaseFirestore.instance.collection('glossary').get();
+    setState(() {
+      _words = querySnapshot.docs.map((doc) => doc['qst'] as String).toList();
+      _wordInfo = querySnapshot.docs.fold<Map<String, String>>({},
+          (previousValue, element) {
+        previousValue[element['qst']] = element['ans'] as String;
+        return previousValue;
+      });
+      _wordSource = querySnapshot.docs.fold<Map<String, String>>({},
+          (previousValue, element) {
+        previousValue[element['qst']] = element['src'] as String;
+        return previousValue;
+      });
+      _filteredWords = _words;
+    });
   }
 
   void _onSearchChanged() {
@@ -50,7 +52,8 @@ class _TriviaPageState extends State<TriviaPage> {
     } else {
       setState(() {
         _filteredWords = _words
-            .where((word) => word.toLowerCase().contains(searchText.toLowerCase()))
+            .where(
+                (word) => word.toLowerCase().contains(searchText.toLowerCase()))
             .toList();
       });
     }
@@ -59,45 +62,55 @@ class _TriviaPageState extends State<TriviaPage> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-        theme: ThemeData.light(),
-        home: Scaffold(
+      theme: ThemeData.light(),
+      home: Scaffold(
         appBar: AppBar(
-        title: Container(
-          width: double.infinity,
-          height:   40,
-          color: Colors.white,
-          child: TextField(
-            controller: _searchController,
-            decoration: InputDecoration(
-              hintText: 'Search...',
-              prefixIcon: Icon(Icons.search),
-              suffixIcon: IconButton(
-                icon: Icon(Icons.clear),
-                onPressed: () {
-                  // Clear the search field
-                  _searchController.clear();
-                },
+          title: Container(
+            width: double.infinity,
+            height: 40,
+            color: Colors.white,
+            child: TextField(
+              controller: _searchController,
+              decoration: InputDecoration(
+                hintText: 'Search...',
+                prefixIcon: const Icon(Icons.search),
+                suffixIcon: IconButton(
+                  icon: const Icon(Icons.clear),
+                  onPressed: () {
+                    // Clear the search field
+                    _searchController.clear();
+                  },
+                ),
+                border: InputBorder.none,
               ),
-              border: InputBorder.none,
             ),
           ),
         ),
+        body: ListView.builder(
+          itemCount: _filteredWords.length,
+          itemBuilder: (context, index) {
+            return ExpansionTile(
+              title: Text(_filteredWords[index]),
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 10.0),
+                    child: Column(
+                      children: [
+                        Text(_wordInfo[_filteredWords[index]] ?? '', textAlign: TextAlign.justify,),
+                        const SizedBox(height: 5),
+                        Text(_wordSource[_filteredWords[index]] ?? '', style: const TextStyle(color: Colors.grey, fontSize: 12), textAlign: TextAlign.left,),
+                        const SizedBox(height: 15),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
       ),
-      body: ListView.builder(
-        itemCount: _filteredWords.length,
-        itemBuilder: (context, index) {
-          return ExpansionTile(
-            title: Text(_filteredWords[index]),
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(_wordInfo[_filteredWords[index]] ?? ''),
-              ),
-            ],
-          );
-        },
-      ),
-    ),
     );
   }
 

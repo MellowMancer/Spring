@@ -32,6 +32,7 @@ dependencies:
   gif_view: ^0.3.1
   pedometer: ^4.0.1
   circular_countdown_timer: ^0.2.3
+  audioplayers: ^5.2.1
 
 dev_dependencies:
   flutter_test:
@@ -49,3 +50,4 @@ flutter:
     # Add assets from the images directory to the application.
     - assets/images/
     - assets/images/pets/cat/
+    - assets/audio/

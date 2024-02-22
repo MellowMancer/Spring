@@ -4,9 +4,10 @@ import 'package:spring/features/screens/daily_tasks/gratitude_page.dart';
 import 'package:spring/features/screens/daily_tasks/walk_page.dart';
 import 'package:spring/features/screens/daily_tasks/kindness_page.dart';
 import 'package:spring/features/screens/daily_tasks/exercise_page.dart';
+import 'package:spring/features/screens/daily_tasks/hobby_page.dart';
+import 'package:spring/features/screens/daily_tasks/meditate_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:spring/features/screens/daily_tasks/hobby_page.dart';
 
 class PetPage extends StatefulWidget {
   const PetPage({super.key});
@@ -23,13 +24,12 @@ class _PetPageState extends State<PetPage> {
       'icon': Icons.pets,
       'title': 'Play with your pet',
       'description': 'Play with your pet by rubbing your finger on them!',
-      'navigateTo': WalkPage()
     },
     {
       'icon': Icons.person,
       'title': 'Meditate for 30 minutes',
       'description': 'Ease your mind and relax to refresh your day!',
-      'navigateTo': WalkPage()
+      'navigateTo': MeditatePage()
     },
     {
       'icon': Icons.local_fire_department,
@@ -78,12 +78,33 @@ class _PetPageState extends State<PetPage> {
   ];
 
   final index = 0;
-  
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final user = FirebaseAuth.instance.currentUser;
-    
+    Offset _sparklePosition = Offset.zero;
+    bool _showSparkle = false;
+
+    Future<int> getCountPlayed() async {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        final userData = await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            .collection('tasks')
+            .doc('Play with your pet')
+            .get();
+        return userData.exists ? userData['count'] : 0;
+      }
+      return 0;
+    }
+
     Future<bool> getCompletion(String title) async {
       final user = FirebaseAuth.instance.currentUser;
       if (user != null) {
@@ -106,9 +127,9 @@ class _PetPageState extends State<PetPage> {
           .where('completed', isEqualTo: true)
           .get();
 
-      return userTasks.docs.length; // This will give you the count of completed tasks
+      return userTasks
+          .docs.length; // This will give you the count of completed tasks
     }
-
 
     return MaterialApp(
       theme: ThemeData.light(),
@@ -125,11 +146,54 @@ class _PetPageState extends State<PetPage> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  GifView.asset(
-                    assetList[index],
-                    height: 200,
-                    width: 200,
-                    frameRate: 10,
+                  Stack(
+                    children: [
+                      GestureDetector(
+                        onTapDown: (TapDownDetails details) {
+                          setState(() {
+                            _sparklePosition = details.localPosition;
+                            _showSparkle = true;
+                            getCountPlayed().then((count) {
+                              if (count < 3) {
+                                FirebaseFirestore.instance
+                                    .collection('users')
+                                    .doc(user!.uid)
+                                    .collection('tasks')
+                                    .doc('Play with your pet')
+                                    .set({'count': count + 1}, SetOptions(merge: true));
+                                FirebaseFirestore.instance
+                                    .collection('users')
+                                    .doc(user.uid)
+                                    .collection('tasks')
+                                    .doc('Play with your pet')
+                                    .set({'completed': false}, SetOptions(merge: true));
+                              }
+                              else{
+                                FirebaseFirestore.instance
+                                    .collection('users')
+                                    .doc(user!.uid)
+                                    .collection('tasks')
+                                    .doc('Play with your pet')
+                                    .set({'completed': true}, SetOptions(merge: true));
+                                FirebaseFirestore.instance
+                                    .collection('users')
+                                    .doc(user.uid)
+                                    .collection('tasks')
+                                    .doc('Play with your pet')
+                                    .set({'count': count + 1}, SetOptions(merge: true));
+                              }
+                            });
+                          });
+                        },
+                        child: GifView.asset(
+                          assetList[index],
+                          height: 200,
+                          width: 200,
+                          frameRate: 10,
+                        ),
+                      ),
+                      if (_showSparkle) Sparkle(position: _sparklePosition),
+                    ],
                   ),
                   const Divider(),
                   const Text('Melfie', style: TextStyle(fontSize: 18)),
@@ -137,16 +201,18 @@ class _PetPageState extends State<PetPage> {
                   const SizedBox(height: 20),
                   FutureBuilder<int>(
                     future: getCompletedTasksCount(user!.uid),
-                    builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
+                    builder:
+                        (BuildContext context, AsyncSnapshot<int> snapshot) {
                       if (snapshot.connectionState == ConnectionState.waiting) {
                         return const CircularProgressIndicator(); // Show a loading indicator while waiting
                       } else if (snapshot.hasError) {
-                        return const Text('Error loading tasks'); // Show error message if there's an error
+                        return const Text(
+                            'Error loading tasks'); // Show error message if there's an error
                       } else {
                         return Text(
                           '${snapshot.data} Goals Completed Today!',
                           style: TextStyle(
-                              fontSize:  18,
+                              fontSize: 18,
                               fontWeight: FontWeight.bold,
                               color: colorScheme.primary),
                         );
@@ -167,8 +233,7 @@ class _PetPageState extends State<PetPage> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: tasks.map((task) {
                             return ListTile(
-                              leading: Icon(task['icon'],
-                                  color: Colors.grey),
+                              leading: Icon(task['icon'], color: Colors.grey),
                               title: Text(
                                 task['title'],
                                 textAlign: TextAlign.start,
@@ -239,6 +304,102 @@ class _PetPageState extends State<PetPage> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class Particle {
+  late Offset position;
+  late Offset velocity;
+  late double size;
+  late Color color;
+  late AnimationController controller;
+  late Animation<double> animation;
+
+  Particle({required this.position, required this.size, required this.color});
+
+  void createAnimation(TickerProvider vsync) {
+    controller = AnimationController(
+      duration: Duration(milliseconds: 500),
+      vsync: vsync,
+    )..addStatusListener((status) {
+        if (status == AnimationStatus.completed) {
+          controller.reverse();
+        } else if (status == AnimationStatus.dismissed) {
+          controller.forward();
+        }
+      });
+    animation = Tween<double>(begin: 0.0, end: 1.0).animate(controller);
+    controller.forward();
+  }
+
+  void update(double dt) {
+    position += velocity * dt;
+  }
+
+  void dispose() {
+    controller.dispose();
+  }
+}
+
+class Sparkle extends StatefulWidget {
+  final Offset position;
+
+  Sparkle({required this.position});
+
+  @override
+  _SparkleState createState() => _SparkleState();
+}
+
+class _SparkleState extends State<Sparkle> with TickerProviderStateMixin {
+  List<Particle> particles = [];
+
+  @override
+  void initState() {
+    super.initState();
+    for (int i = 0; i < 5; i++) {
+      particles.add(Particle(
+        position: widget.position,
+        size: 5.0, // Adjust size as needed
+        color: Colors.yellow, // Adjust color as needed
+      ));
+      particles[i].createAnimation(this);
+    }
+  }
+
+  @override
+  void dispose() {
+    for (var particle in particles) {
+      particle.dispose();
+    }
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: particles.map((particle) {
+        return AnimatedBuilder(
+          animation: particle.controller,
+          builder: (BuildContext context, Widget? child) {
+            return Positioned(
+              left: particle.position.dx,
+              top: particle.position.dy,
+              child: Opacity(
+                opacity: particle.animation.value,
+                child: Container(
+                  width: particle.size,
+                  height: particle.size,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: particle.color,
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      }).toList(),
     );
   }
 }

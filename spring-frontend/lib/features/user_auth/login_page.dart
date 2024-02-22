@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:spring/features/widgets/form_container_widget.dart';
 import 'package:spring/features/user_auth/signup_page.dart';
-import 'package:spring/features/screens/home_page.dart';
 import 'package:spring/features/widgets/bottom_navigation_bar.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginPage extends StatefulWidget {
@@ -79,10 +76,24 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
+    // final colorScheme = ColorScheme.fromSwatch(primarySwatch: MaterialColor(0xFFA2E003, <int, Color>{
+    //       50: Color.fromARGB(255, 231, 255, 170),
+    //       100: Color(0xFFA2E003),
+    //       200: Color(0xFFA2E003),
+    //       300: Color(0xFFA2E003),
+    //       400: Color(0xFFA2E003),
+    //       500: Color(0xFFA2E003),
+    //       600: Color(0xFFA2E003),
+    //       700: Color(0xFFA2E003),
+    //       800: Color(0xFFA2E003),
+    //       900: Color(0xFFA2E003),
+    //     }));
+    final colorScheme = ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 255, 59, 85));
     return MaterialApp(
-      theme: ThemeData.light(),
+      theme:
+      ThemeData(
+        colorScheme: colorScheme,
+        ),
       home: StreamBuilder<User?>(
         stream: FirebaseAuth.instance.authStateChanges(),
         builder: (context, snapshot) {
@@ -90,11 +101,12 @@ class _LoginPageState extends State<LoginPage> {
             User? user = snapshot.data;
             if (user != null) {
               // User is signed in, navigate to the home page
-              return BottomNavBar();
+              return const BottomNavBar();
             }
           }
           // User is not signed in or the auth state is still loading, show the login page
           return Scaffold(
+            backgroundColor: Colors.white,
             appBar: AppBar(
               title: const Text('Spring Up Your Health!',
                   style: TextStyle(

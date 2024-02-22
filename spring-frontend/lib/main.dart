@@ -56,7 +56,7 @@ class MyApp extends StatelessWidget {
         //   '/chatbot': (context) => ChatScreen(),
         // },
 
-        theme: ThemeData.from(colorScheme: colorScheme),
+        // theme: ThemeData.from(colorScheme: colorScheme),
         
 
         debugShowCheckedModeBanner: false,

@@ -29,6 +29,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
+      backgroundColor: Color.fromARGB(255, 255, 255, 255),
       appBar: AppBar(
         title: Text(
           "Home",
@@ -36,11 +37,15 @@ class _HomePageState extends State<HomePage> {
         ),
         centerTitle: true,
       ),
-      body: Center(
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text('Welcome to the Home Page'),
+            const Text(
+              'Welcome to the Home Page',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
             const SizedBox(height: 30),
             const Text(
               'What is your mood today?',
@@ -50,43 +55,16 @@ class _HomePageState extends State<HomePage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                ElevatedButton.icon(
-                  onPressed: () => _selectMood(0),
-                  icon: const Icon(Icons.sentiment_very_satisfied),
-                  label: const Text('Happy'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: colorScheme.primary,
-                    foregroundColor: _selectedMood == 0
-                        ? colorScheme.onPrimary
-                        : colorScheme.onPrimary.withOpacity(0.5),
-                  ),
-                ),
-                ElevatedButton.icon(
-                  onPressed: () => _selectMood(1),
-                  icon: const Icon(Icons.sentiment_neutral),
-                  label: const Text('Neutral'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: colorScheme.primary,
-                    foregroundColor: _selectedMood == 1
-                        ? colorScheme.onPrimary
-                        : colorScheme.onPrimary.withOpacity(0.5),
-                  ),
-                ),
-                ElevatedButton.icon(
-                  onPressed: () => _selectMood(2),
-                  icon: const Icon(Icons.sentiment_very_dissatisfied),
-                  label: const Text('Sad'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: colorScheme.primary,
-                    foregroundColor: _selectedMood == 2
-                        ? colorScheme.onPrimary
-                        : colorScheme.onPrimary.withOpacity(0.5),
-                  ),
-                ),
+                _buildMoodButton(
+                    0, Icons.sentiment_very_satisfied, 'Happy', colorScheme),
+                _buildMoodButton(
+                    1, Icons.sentiment_neutral, 'Neutral', colorScheme),
+                _buildMoodButton(
+                    2, Icons.sentiment_very_dissatisfied, 'Sad', colorScheme),
               ],
             ),
             const SizedBox(height: 30),
-            ...List.generate(4, (index) {
+            ...List.generate(3, (index) {
               String buttonText;
               String description;
               IconData buttonIcon;
@@ -105,12 +83,6 @@ class _HomePageState extends State<HomePage> {
                   windowContent = MoodTrackingWindow();
                   break;
                 case 2:
-                  buttonText = 'Gratitude Journaling';
-                  description = 'Record your gratitude';
-                  buttonIcon = Icons.edit;
-                  windowContent = GratitudeJournalingWindow();
-                  break;
-                case 3:
                   buttonText = 'Diary';
                   description = 'Write your thoughts and experiences';
                   buttonIcon = Icons.book;
@@ -122,18 +94,20 @@ class _HomePageState extends State<HomePage> {
                   buttonIcon = Icons.star;
                   windowContent = DefaultWindow();
               }
-              // Wrap the button with a SizedBox to give it a fixed size
               return SizedBox(
-                width: MediaQuery.of(context).size.width * 0.9, // 90% of screen width
+                width: MediaQuery.of(context).size.width *
+                    0.9, //  90% of screen width
+                height: 60,
                 child: ElevatedButton.icon(
                   onPressed: () => _openWindow(context, windowContent),
                   icon: Icon(buttonIcon),
                   label: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start, // Aligns children to the start (left)
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         buttonText,
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
                         textAlign: TextAlign.left,
                       ),
                       Text(
@@ -144,8 +118,8 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
                   style: ElevatedButton.styleFrom(
-                    foregroundColor: colorScheme.onPrimary,
-                    backgroundColor: colorScheme.primary,
+                    foregroundColor: colorScheme.onPrimaryContainer,
+                    backgroundColor: colorScheme.primaryContainer,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(5),
                     ),
@@ -157,6 +131,30 @@ class _HomePageState extends State<HomePage> {
             }).expand((button) => [button, const SizedBox(height: 10)]),
           ],
         ),
+      ),
+    );
+  }
+
+  ElevatedButton _buildMoodButton(
+      int mood, IconData icon, String label, ColorScheme colorScheme) {
+    return ElevatedButton.icon(
+      onPressed: () => _selectMood(mood),
+      icon: Icon(icon, color: _selectedMood == mood
+            ? colorScheme.onPrimary
+            : colorScheme.onSurface,),
+      label: Text(label, style: TextStyle(color: _selectedMood == mood
+            ? colorScheme.onPrimary
+            : colorScheme.onSurface,)),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: _selectedMood == mood
+            ? colorScheme.primary
+            : colorScheme.surface,
+        foregroundColor: colorScheme.onPrimary,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(5),
+        ),
+        alignment: Alignment.center, // This aligns the text vertically
       ),
     );
   }
@@ -267,7 +265,8 @@ class _SleepTrackingWindowState extends State<SleepTrackingWindow> {
       if (hoursSlept >= 7 && hoursSlept <= 9) {
         _sleepQuality = 'You slept well!';
       } else {
-        _sleepQuality = 'You should aim for 7-9 hours of sleep for better health.';
+        _sleepQuality =
+            'You should aim for 7-9 hours of sleep for better health.';
       }
       _hoursSlept = 'You slept for $hoursSlept hours.';
     });
