@@ -419,22 +419,69 @@ class MoodTrackingWindow extends StatelessWidget {
 class DiaryWindow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    // Get today's date
+    final DateTime now = DateTime.now();
+    final DateFormat formatter = DateFormat('EEEE, MMMM d, yyyy');
+    final String formattedDate = formatter.format(now);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Diary Window'),
+        title: Text('Diary Entry'),
       ),
-      body: Center(
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            Text('Diary Window'),
-            // Add more UI elements specific to diary
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Today\'s Date:',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 10),
+            Text(
+              formattedDate,
+              style: TextStyle(fontSize: 16),
+            ),
+            SizedBox(height: 20),
+            Text(
+              'Dear Diary,',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+            ),
+            SizedBox(height: 10),
+            Expanded(
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey),
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                padding: EdgeInsets.all(10.0),
+                child: TextField(
+                  maxLines: null,
+                  expands: true,
+                  decoration: InputDecoration(
+                    hintText: 'Write your thoughts here...',
+                    border: InputBorder.none,
+                  ),
+                ),
+              ),
+            ),
+            SizedBox(height: 20),
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  // Handle submit button press
+                  // You can add your submission logic here
+                },
+                child: Text('Submit'),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 }
+
 
 class DefaultWindow extends StatelessWidget {
   @override
