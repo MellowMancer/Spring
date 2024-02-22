@@ -194,9 +194,15 @@ class _SleepTrackingWindowState extends State<SleepTrackingWindow> {
   TimeOfDay _wakeupTime = TimeOfDay.now();
   String _sleepQuality = '';
   String _hoursSlept = '';
-
-  // Add a list to store the data points for the graph
   List<double> _sleepData = [];
+  List<String> _sleepNotes = [];
+
+  // Sleep Goals
+  TimeOfDay _targetBedtime = TimeOfDay(hour: 22, minute: 0); // Default target bedtime
+  TimeOfDay _targetWakeupTime = TimeOfDay(hour: 7, minute: 0); // Default target wakeup time
+
+  // Sleep Trends
+  List<double> _weeklySleepDuration = [7.5, 7.8, 7.2, 8.0, 7.6, 7.4, 7.9]; // Placeholder data for weekly sleep duration
 
   @override
   Widget build(BuildContext context) {
@@ -204,105 +210,224 @@ class _SleepTrackingWindowState extends State<SleepTrackingWindow> {
       appBar: AppBar(
         title: const Text('Sleep Tracking Window'),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Bedtime:',
-                  style: TextStyle(fontSize: 18),
-                ),
-                ElevatedButton(
-                  onPressed: () => _selectTime(context, true),
-                  child: Text(
-                    _formatTime(_bedtime),
-                    style: TextStyle(fontSize: 18),
-                  ),
-                ),
-              ],
-            ),
+            // Sleep Goals
+            _buildSectionTitle('Sleep Goals:'),
+            _buildSleepGoals(),
             SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Wakeup Time:',
-                  style: TextStyle(fontSize: 18),
-                ),
-                ElevatedButton(
-                  onPressed: () => _selectTime(context, false),
-                  child: Text(
-                    _formatTime(_wakeupTime),
-                    style: TextStyle(fontSize: 18),
-                  ),
-                ),
-              ],
-            ),
+
+            // Sleep Trends
+            _buildSectionTitle('Sleep Trends:'),
+            _buildSleepTrends(),
             SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _calculateSleepQuality,
-              child: Text('Submit'),
-            ),
+
+            // Input Fields: Bedtime, Wakeup Time, Submit Button, Sleep Tracking Graph
+            _buildInputFieldsAndGraph(),
             SizedBox(height: 20),
-            Text(
-              _sleepQuality,
-              style: TextStyle(fontSize: 18),
-            ),
-            SizedBox(height: 10),
-            Text(
-              _hoursSlept,
-              style: TextStyle(fontSize: 18),
-            ),
+
+            // Sleep Environment
+            _buildSectionTitle('Sleep Environment:'),
+            _buildSleepEnvironment(),
             SizedBox(height: 20),
-            // Add the graph below the existing text widgets
-            Text(
-              'Sleep Tracking',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            SizedBox(height: 10),
-            Container(
-              height: 200,
-              child: LineChart(
-                LineChartData(
-                  lineBarsData: [
-                    LineChartBarData(
-                      spots: _generateSpots(), // Generate spots for the graph
-                      isCurved: true,
-                      colors: [Colors.blue],
-                      barWidth: 4,
-                      belowBarData: BarAreaData(show: false),
-                    ),
-                  ],
-                  titlesData: FlTitlesData(
-                    leftTitles: SideTitles(showTitles: true),
-                    bottomTitles: SideTitles(showTitles: true),
-                  ),
-                  borderData: FlBorderData(show: true),
-                  minX: 0,
-                  maxX: _sleepData.length.toDouble() - 1,
-                  minY: 0,
-                  maxY: 24,
-                ),
-              ),
-            ),
+
+            // Sleep Tips
+            _buildSectionTitle('Sleep Tips:'),
+            _buildSleepTips(),
+            SizedBox(height: 20),
+
+            // Sleep Notes
+            // _buildSectionTitle('Sleep Notes:'),
+            // _buildSleepNotes(),
           ],
         ),
       ),
     );
   }
 
-  // Method to generate spots for the graph
-  List<FlSpot> _generateSpots() {
-    List<FlSpot> spots = [];
-    for (int i = 0; i < _sleepData.length; i++) {
-      spots.add(FlSpot(i.toDouble(), _sleepData[i]));
-    }
-    return spots;
+  // Helper Methods
+
+  Widget _buildSectionTitle(String title) {
+    return Text(
+      title,
+      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+    );
   }
+
+  Widget _buildSleepGoals() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Target Bedtime: ${_formatTime(_targetBedtime)}'),
+        Text('Target Wakeup Time: ${_formatTime(_targetWakeupTime)}'),
+      ],
+    );
+  }
+
+  Widget _buildSleepTrends() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Weekly Sleep Duration Trends:'),
+        SizedBox(height: 10),
+        Container(
+          height: 150,
+          child: LineChart(
+            LineChartData(
+              lineBarsData: [
+                LineChartBarData(
+                  spots: _generateWeeklySleepSpots(),
+                  isCurved: true,
+                  colors: [Colors.blue],
+                  barWidth: 2,
+                  belowBarData: BarAreaData(show: false),
+                ),
+              ],
+              titlesData: FlTitlesData(
+                leftTitles: SideTitles(showTitles: true),
+                bottomTitles: SideTitles(showTitles: true),
+              ),
+              borderData: FlBorderData(show: true),
+              minX: 0,
+              maxX: 6,
+              minY: 0,
+              maxY: 10,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildInputFieldsAndGraph() {
+    return Column(
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Bedtime:',
+              style: TextStyle(fontSize: 18),
+            ),
+            ElevatedButton(
+              onPressed: () => _selectTime(context, true),
+              child: Text(
+                _formatTime(_bedtime),
+                style: TextStyle(fontSize: 18),
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 20),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Wakeup Time:',
+              style: TextStyle(fontSize: 18),
+            ),
+            ElevatedButton(
+              onPressed: () => _selectTime(context, false),
+              child: Text(
+                _formatTime(_wakeupTime),
+                style: TextStyle(fontSize: 18),
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 20),
+        ElevatedButton(
+          onPressed: _calculateSleepQuality,
+          child: Text('Submit'),
+        ),
+        SizedBox(height: 20),
+        Text(
+          'Sleep Tracking',
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        SizedBox(height: 10),
+        Container(
+          height: 200,
+          child: LineChart(
+            LineChartData(
+              lineBarsData: [
+                LineChartBarData(
+                  spots: _generateSpots(),
+                  isCurved: true,
+                  colors: [Colors.blue],
+                  barWidth: 4,
+                  belowBarData: BarAreaData(show: false),
+                ),
+              ],
+              titlesData: FlTitlesData(
+                leftTitles: SideTitles(showTitles: true),
+                bottomTitles: SideTitles(showTitles: true),
+              ),
+              borderData: FlBorderData(show: true),
+              minX: 0,
+              maxX: _sleepData.length.toDouble() - 1,
+              minY: 0,
+              maxY: 24,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSleepEnvironment() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('- Maintain a comfortable room temperature (around 65-70°F)'),
+        Text('- Keep the bedroom dark and quiet'),
+        Text('- Consider using white noise machines or earplugs if noise is an issue'),
+      ],
+    );
+  }
+
+  Widget _buildSleepTips() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('- Establish a consistent bedtime routine to signal to your body that it is time to sleep'),
+        Text('- Avoid caffeine and heavy meals close to bedtime'),
+        Text('- Limit screen time before bed and consider using blue light filters on electronic devices'),
+      ],
+    );
+  }
+
+  // Widget _buildSleepNotes() {
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       TextField(
+  //         decoration: InputDecoration(
+  //           hintText: 'Add notes about your sleep...',
+  //           border: OutlineInputBorder(),
+  //         ),
+  //         maxLines: null,
+  //         onChanged: (value) {
+  //           // Store sleep notes in a list
+  //           setState(() {
+  //             _sleepNotes.add(value);
+  //           });
+  //         },
+  //       ),
+  //       SizedBox(height: 10),
+  //       Text('Sleep Notes:', style: TextStyle(fontWeight: FontWeight.bold)),
+  //       SizedBox(height: 5),
+  //       Column(
+  //         crossAxisAlignment: CrossAxisAlignment.start,
+  //         children: _sleepNotes.map((note) => Text('- $note')).toList(),
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Future<void> _selectTime(BuildContext context, bool isBedtime) async {
     final TimeOfDay? picked = await showTimePicker(
@@ -330,15 +455,30 @@ class _SleepTrackingWindowState extends State<SleepTrackingWindow> {
     final hoursSlept = ((wakeupTimeMinutes - bedtimeMinutes) / 60).round() + 24;
 
     setState(() {
-      _sleepData.add(hoursSlept.toDouble()); // Add the hours slept to the data for the graph
+      _sleepData.add(hoursSlept.toDouble());
       if (hoursSlept >= 7 && hoursSlept <= 9) {
         _sleepQuality = 'You slept well!';
       } else {
-        _sleepQuality =
-            'You should aim for 7-9 hours of sleep for better health.';
+        _sleepQuality = 'You should aim for 7-9 hours of sleep for better health.';
       }
       _hoursSlept = 'You slept for $hoursSlept hours.';
     });
+  }
+
+  List<FlSpot> _generateSpots() {
+    List<FlSpot> spots = [];
+    for (int i = 0; i < _sleepData.length; i++) {
+      spots.add(FlSpot(i.toDouble(), _sleepData[i]));
+    }
+    return spots;
+  }
+
+  List<FlSpot> _generateWeeklySleepSpots() {
+    List<FlSpot> spots = [];
+    for (int i = 0; i < _weeklySleepDuration.length; i++) {
+      spots.add(FlSpot(i.toDouble(), _weeklySleepDuration[i]));
+    }
+    return spots;
   }
 }
 
