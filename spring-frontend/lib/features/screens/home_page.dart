@@ -1,6 +1,9 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
+//
 
 void main() {
   runApp(const MaterialApp(
@@ -9,7 +12,7 @@ void main() {
 }
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
+  const HomePage({super.key});
 
   static const String routeName = '/homepage';
 
@@ -20,27 +23,30 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   int _selectedMood = -1; // -1 indicates no mood selected
 
-  List<int> _moodData = [0, 0, 0, 0, 0, 0, 0]; // List to store mood data for each day of the week
-  final List<String> _days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']; // Days of the week
-
   void _selectMood(int mood) {
+    final user = FirebaseAuth.instance.currentUser;
     setState(() {
       _selectedMood = mood;
-      _updateMoodData(); // Update mood data when mood is selected
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(user!.uid)
+          .collection('mood')
+          .doc('mood${DateFormat('y-MM-dd').format(DateTime.now())}')
+          .set({
+        'mood': mood,
+        'date': DateTime.now(),
+      }, SetOptions(merge: true));
+      // _updateMoodData(); // Update mood data when mood is selected
     });
   }
 
-  void _updateMoodData() {
-    // Update mood data based on the selected mood and current day
-    final DateTime now = DateTime.now();
-    final DateFormat formatter = DateFormat('E'); // Format to get the day of the week (e.g., Mon, Tue, etc.)
-    final String formattedDay = formatter.format(now);
+  // void _updateMoodData() {
+  //   // Update mood data based on the selected mood and current day
+  //   final DateTime now = DateTime.now();
+  //   final DateFormat formatter = DateFormat('d'); // Format to get only the date
+  //   final String formattedDay = formatter.format(now);
 
-    int dayIndex = _days.indexOf(formattedDay);
-    if (dayIndex != -1) {
-      _moodData[dayIndex] = _selectedMood;
-    }
-  }
+  // }
 
   void _openWindow(BuildContext context, Widget windowContent) {
     Navigator.push(
@@ -53,11 +59,11 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 255, 255, 255),
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       appBar: AppBar(
         title: Text(
           "Home",
-          style: Theme.of(context).textTheme.headline6,
+          style: Theme.of(context).textTheme.titleLarge,
         ),
         centerTitle: true,
       ),
@@ -98,13 +104,13 @@ class _HomePageState extends State<HomePage> {
                   buttonText = 'Sleep Tracking';
                   description = 'Track your sleep patterns';
                   buttonIcon = Icons.bedtime;
-                  windowContent = SleepTrackingWindow();
+                  windowContent = const SleepTrackingWindow();
                   break;
                 case 1:
                   buttonText = 'Mood Tracking';
                   description = 'Track your mood over time';
                   buttonIcon = Icons.mood;
-                  windowContent = MoodTrackingWindow(moodData: _moodData, days: _days);
+                  windowContent = const MoodTrackingWindow();
                   break;
                 case 2:
                   buttonText = 'Diary';
@@ -163,16 +169,21 @@ class _HomePageState extends State<HomePage> {
       int mood, IconData icon, String label, ColorScheme colorScheme) {
     return ElevatedButton.icon(
       onPressed: () => _selectMood(mood),
-      icon: Icon(icon, color: _selectedMood == mood
+      icon: Icon(
+        icon,
+        color: _selectedMood == mood
             ? colorScheme.onPrimary
-            : colorScheme.onSurface,),
-      label: Text(label, style: TextStyle(color: _selectedMood == mood
-            ? colorScheme.onPrimary
-            : colorScheme.onSurface,)),
+            : colorScheme.onSurface,
+      ),
+      label: Text(label,
+          style: TextStyle(
+            color: _selectedMood == mood
+                ? colorScheme.onPrimary
+                : colorScheme.onSurface,
+          )),
       style: ElevatedButton.styleFrom(
-        backgroundColor: _selectedMood == mood
-            ? colorScheme.primary
-            : colorScheme.surface,
+        backgroundColor:
+            _selectedMood == mood ? colorScheme.primary : colorScheme.surface,
         foregroundColor: colorScheme.onPrimary,
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         shape: RoundedRectangleBorder(
@@ -185,6 +196,10 @@ class _HomePageState extends State<HomePage> {
 }
 
 class SleepTrackingWindow extends StatefulWidget {
+  const SleepTrackingWindow({super.key});
+
+  static const String routeName = '/sleeptrackingpage';
+
   @override
   _SleepTrackingWindowState createState() => _SleepTrackingWindowState();
 }
@@ -194,15 +209,14 @@ class _SleepTrackingWindowState extends State<SleepTrackingWindow> {
   TimeOfDay _wakeupTime = TimeOfDay.now();
   String _sleepQuality = '';
   String _hoursSlept = '';
-  List<double> _sleepData = [];
-  List<String> _sleepNotes = [];
+  final List<double> _sleepData = [];
+  final List<String> _sleepNotes = [];
 
   // Sleep Goals
-  TimeOfDay _targetBedtime = TimeOfDay(hour: 22, minute: 0); // Default target bedtime
-  TimeOfDay _targetWakeupTime = TimeOfDay(hour: 7, minute: 0); // Default target wakeup time
-
-  // Sleep Trends
-  List<double> _weeklySleepDuration = [7.5, 7.8, 7.2, 8.0, 7.6, 7.4, 7.9]; // Placeholder data for weekly sleep duration
+  final TimeOfDay _targetBedtime =
+      const TimeOfDay(hour: 22, minute: 0); // Default target bedtime
+  final TimeOfDay _targetWakeupTime =
+      const TimeOfDay(hour: 7, minute: 0); // Default target wakeup time
 
   @override
   Widget build(BuildContext context) {
@@ -219,26 +233,21 @@ class _SleepTrackingWindowState extends State<SleepTrackingWindow> {
             // Sleep Goals
             _buildSectionTitle('Sleep Goals:'),
             _buildSleepGoals(),
-            SizedBox(height: 20),
-
-            // Sleep Trends
-            _buildSectionTitle('Sleep Trends:'),
-            _buildSleepTrends(),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
             // Input Fields: Bedtime, Wakeup Time, Submit Button, Sleep Tracking Graph
             _buildInputFieldsAndGraph(),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
             // Sleep Environment
             _buildSectionTitle('Sleep Environment:'),
             _buildSleepEnvironment(),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
             // Sleep Tips
             _buildSectionTitle('Sleep Tips:'),
             _buildSleepTips(),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
 
             // Sleep Notes
             // _buildSectionTitle('Sleep Notes:'),
@@ -254,7 +263,7 @@ class _SleepTrackingWindowState extends State<SleepTrackingWindow> {
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
-      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
     );
   }
 
@@ -268,48 +277,13 @@ class _SleepTrackingWindowState extends State<SleepTrackingWindow> {
     );
   }
 
-  Widget _buildSleepTrends() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text('Weekly Sleep Duration Trends:'),
-        SizedBox(height: 10),
-        Container(
-          height: 150,
-          child: LineChart(
-            LineChartData(
-              lineBarsData: [
-                LineChartBarData(
-                  spots: _generateWeeklySleepSpots(),
-                  isCurved: true,
-                  colors: [Colors.blue],
-                  barWidth: 2,
-                  belowBarData: BarAreaData(show: false),
-                ),
-              ],
-              titlesData: FlTitlesData(
-                leftTitles: SideTitles(showTitles: true),
-                bottomTitles: SideTitles(showTitles: true),
-              ),
-              borderData: FlBorderData(show: true),
-              minX: 0,
-              maxX: 6,
-              minY: 0,
-              maxY: 10,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildInputFieldsAndGraph() {
     return Column(
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
+            const Text(
               'Bedtime:',
               style: TextStyle(fontSize: 18),
             ),
@@ -317,16 +291,16 @@ class _SleepTrackingWindowState extends State<SleepTrackingWindow> {
               onPressed: () => _selectTime(context, true),
               child: Text(
                 _formatTime(_bedtime),
-                style: TextStyle(fontSize: 18),
+                style: const TextStyle(fontSize: 18),
               ),
             ),
           ],
         ),
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(
+            const Text(
               'Wakeup Time:',
               style: TextStyle(fontSize: 18),
             ),
@@ -334,23 +308,23 @@ class _SleepTrackingWindowState extends State<SleepTrackingWindow> {
               onPressed: () => _selectTime(context, false),
               child: Text(
                 _formatTime(_wakeupTime),
-                style: TextStyle(fontSize: 18),
+                style: const TextStyle(fontSize: 18),
               ),
             ),
           ],
         ),
-        SizedBox(height: 20),
+        const SizedBox(height: 20),
         ElevatedButton(
           onPressed: _calculateSleepQuality,
-          child: Text('Submit'),
+          child: const Text('Submit'),
         ),
-        SizedBox(height: 20),
-        Text(
+        const SizedBox(height: 20),
+        const Text(
           'Sleep Tracking',
           style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
         ),
-        SizedBox(height: 10),
-        Container(
+        const SizedBox(height: 10),
+        SizedBox(
           height: 200,
           child: LineChart(
             LineChartData(
@@ -380,54 +354,57 @@ class _SleepTrackingWindowState extends State<SleepTrackingWindow> {
   }
 
   Widget _buildSleepEnvironment() {
-    return Column(
+    return const Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('- Maintain a comfortable room temperature (around 65-70°F)'),
         Text('- Keep the bedroom dark and quiet'),
-        Text('- Consider using white noise machines or earplugs if noise is an issue'),
+        Text(
+            '- Consider using white noise machines or earplugs if noise is an issue'),
       ],
     );
   }
 
   Widget _buildSleepTips() {
-    return Column(
+    return const Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('- Establish a consistent bedtime routine to signal to your body that it is time to sleep'),
+        Text(
+            '- Establish a consistent bedtime routine to signal to your body that it is time to sleep'),
         Text('- Avoid caffeine and heavy meals close to bedtime'),
-        Text('- Limit screen time before bed and consider using blue light filters on electronic devices'),
+        Text(
+            '- Limit screen time before bed and consider using blue light filters on electronic devices'),
       ],
     );
   }
 
-  // Widget _buildSleepNotes() {
-  //   return Column(
-  //     crossAxisAlignment: CrossAxisAlignment.start,
-  //     children: [
-  //       TextField(
-  //         decoration: InputDecoration(
-  //           hintText: 'Add notes about your sleep...',
-  //           border: OutlineInputBorder(),
-  //         ),
-  //         maxLines: null,
-  //         onChanged: (value) {
-  //           // Store sleep notes in a list
-  //           setState(() {
-  //             _sleepNotes.add(value);
-  //           });
-  //         },
-  //       ),
-  //       SizedBox(height: 10),
-  //       Text('Sleep Notes:', style: TextStyle(fontWeight: FontWeight.bold)),
-  //       SizedBox(height: 5),
-  //       Column(
-  //         crossAxisAlignment: CrossAxisAlignment.start,
-  //         children: _sleepNotes.map((note) => Text('- $note')).toList(),
-  //       ),
-  //     ],
-  //   );
-  // }
+  Widget _buildSleepNotes() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextField(
+          decoration: InputDecoration(
+            hintText: 'Add notes about your sleep...',
+            border: OutlineInputBorder(),
+          ),
+          maxLines: null,
+          onChanged: (value) {
+            // Store sleep notes in a list
+            setState(() {
+              _sleepNotes.add(value);
+            });
+          },
+        ),
+        SizedBox(height: 10),
+        Text('Sleep Notes:', style: TextStyle(fontWeight: FontWeight.bold)),
+        SizedBox(height: 5),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: _sleepNotes.map((note) => Text('- $note')).toList(),
+        ),
+      ],
+    );
+  }
 
   Future<void> _selectTime(BuildContext context, bool isBedtime) async {
     final TimeOfDay? picked = await showTimePicker(
@@ -459,7 +436,8 @@ class _SleepTrackingWindowState extends State<SleepTrackingWindow> {
       if (hoursSlept >= 7 && hoursSlept <= 9) {
         _sleepQuality = 'You slept well!';
       } else {
-        _sleepQuality = 'You should aim for 7-9 hours of sleep for better health.';
+        _sleepQuality =
+            'You should aim for 7-9 hours of sleep for better health.';
       }
       _hoursSlept = 'You slept for $hoursSlept hours.';
     });
@@ -473,20 +451,17 @@ class _SleepTrackingWindowState extends State<SleepTrackingWindow> {
     return spots;
   }
 
-  List<FlSpot> _generateWeeklySleepSpots() {
-    List<FlSpot> spots = [];
-    for (int i = 0; i < _weeklySleepDuration.length; i++) {
-      spots.add(FlSpot(i.toDouble(), _weeklySleepDuration[i]));
-    }
-    return spots;
-  }
+  // List<FlSpot> _generateWeeklySleepSpots() {
+  //   List<FlSpot> spots = [];
+  //   for (int i = 0; i < _weeklySleepDuration.length; i++) {
+  //     spots.add(FlSpot(i.toDouble(), _weeklySleepDuration[i]));
+  //   }
+  //   return spots;
+  // }
 }
 
 class MoodTrackingWindow extends StatefulWidget {
-  final List<int> moodData;
-  final List<String> days;
-
-  const MoodTrackingWindow({required this.moodData, required this.days});
+  const MoodTrackingWindow({super.key});
 
   @override
   _MoodTrackingWindowState createState() => _MoodTrackingWindowState();
@@ -494,6 +469,55 @@ class MoodTrackingWindow extends StatefulWidget {
 
 class _MoodTrackingWindowState extends State<MoodTrackingWindow> {
   String? moodGoal;
+  List<int> moodData = [];
+  List<String> days = [];
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+  }
+
+  Future<void> fetchData() async {
+    final DateTime now = DateTime.now();
+    final DateTime sevenDaysAgo = now.subtract(const Duration(days: 7));
+    final user = FirebaseAuth.instance.currentUser;
+    final QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('mood')
+        .where('date', isGreaterThanOrEqualTo: sevenDaysAgo)
+        .orderBy('date', descending: true)
+        .limit(7)
+        .get();
+
+    // Create a map to store mood data with date as key
+    Map<DateTime, int> moodDataMap = {};
+    for (var doc in querySnapshot.docs) {
+      final DateTime date = doc['date'].toDate();
+      final DateTime roundedDate = DateTime(date.year, date.month, date.day);
+      moodDataMap[roundedDate] = doc['mood'] as int;
+      // print(moodDataMap[date]);
+    }
+    
+
+    // Generate a list of mood scores for the past  7 days, filling with  0 if not present
+    List<int> moodDataList = List.generate(7, (index) {
+      final DateTime date = now.subtract(Duration(days: index));
+      final DateTime roundedDate = DateTime(date.year, date.month, date.day);
+      return moodDataMap[roundedDate] ??
+          0; // Use the mood score if available, or  0 if not
+    });
+
+    // Update state with the new data
+    setState(() {
+      moodData = moodDataList;
+      days = moodDataMap.keys.map((date) {
+        return DateFormat('E').format(date);
+      }).toList();
+      // Assuming days are already defined as ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -505,42 +529,43 @@ class _MoodTrackingWindowState extends State<MoodTrackingWindow> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
+            const Text(
               'Mood Tracking',
-              style: TextStyle(fontSize:  24, fontWeight: FontWeight.bold),
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height:  20),
-            Container(
-              width: MediaQuery.of(context).size.width *  0.8,
-              height:  300,
+            const SizedBox(height: 20),
+            SizedBox(
+              width: MediaQuery.of(context).size.width * 0.8,
+              height: 300,
               child: LineChart(
                 LineChartData(
                   lineBarsData: [
                     LineChartBarData(
-                      spots: widget.moodData.asMap().entries.map((entry) {
-                        return FlSpot(entry.key.toDouble(), entry.value.toDouble());
+                      spots: moodData.asMap().entries.map((entry) {
+                        return FlSpot(
+                            entry.key.toDouble(), entry.value.toDouble());
                       }).toList(),
                       isCurved: true,
                       colors: [Colors.blue],
-                      barWidth:  4,
+                      barWidth: 4,
                       isStrokeCapRound: true,
                       belowBarData: BarAreaData(show: false),
                     ),
                   ],
-                  minY:  0,
+                  minY: 0,
                   titlesData: FlTitlesData(
                     leftTitles: SideTitles(showTitles: true),
                     bottomTitles: SideTitles(
                       showTitles: true,
                       getTitles: (value) {
-                        if (value.toInt() >=  0 && value.toInt() < widget.days.length) {
-                          return widget.days[value.toInt()];
+                        if (value.toInt() >= 0 && value.toInt() < days.length) {
+                          return days[value.toInt()];
                         }
                         return '';
                       },
-                      margin:  10,
+                      margin: 10,
                       rotateAngle: -45,
-                      interval:  1,
+                      interval: 1,
                     ),
                   ),
                   borderData: FlBorderData(
@@ -552,20 +577,20 @@ class _MoodTrackingWindowState extends State<MoodTrackingWindow> {
                     drawHorizontalLine: true,
                     drawVerticalLine: true,
                   ),
-                  maxX: widget.days.length.toDouble() -  1,
+                  maxX: days.length.toDouble() - 1,
                 ),
               ),
             ),
-            SizedBox(height:  20),
+            const SizedBox(height: 20),
             Text(
               moodGoal ?? 'No mood goal set yet.',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize:  18, fontWeight: FontWeight.bold),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height:  20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () => _showMoodGoalDialog(context),
-              child: Text('Set Mood Goal'),
+              child: const Text('Set Mood Goal'),
             ),
           ],
         ),
@@ -578,24 +603,25 @@ class _MoodTrackingWindowState extends State<MoodTrackingWindow> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Set Mood Goal'),
+          title: const Text('Set Mood Goal'),
           content: TextField(
             onChanged: (value) {
               setState(() {
                 moodGoal = value;
               });
             },
-            decoration: InputDecoration(hintText: "Enter your mood goal here"),
+            decoration:
+                const InputDecoration(hintText: "Enter your mood goal here"),
           ),
           actions: <Widget>[
             TextButton(
-              child: Text('Cancel'),
+              child: const Text('Cancel'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text('Set'),
+              child: const Text('Set'),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -607,7 +633,6 @@ class _MoodTrackingWindowState extends State<MoodTrackingWindow> {
   }
 }
 
-
 class DiaryWindow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -618,36 +643,36 @@ class DiaryWindow extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Diary Entry'),
+        title: const Text('Diary Entry'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'Today\'s Date:',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Text(
               formattedDate,
-              style: TextStyle(fontSize: 16),
+              style: const TextStyle(fontSize: 16),
             ),
-            SizedBox(height: 20),
-            Text(
+            const SizedBox(height: 20),
+            const Text(
               'Dear Diary,',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
-            SizedBox(height: 10),
+            const SizedBox(height: 10),
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey),
                   borderRadius: BorderRadius.circular(10.0),
                 ),
-                padding: EdgeInsets.all(10.0),
-                child: TextField(
+                padding: const EdgeInsets.all(10.0),
+                child: const TextField(
                   maxLines: null,
                   expands: true,
                   decoration: InputDecoration(
@@ -657,14 +682,14 @@ class DiaryWindow extends StatelessWidget {
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             Center(
               child: ElevatedButton(
                 onPressed: () {
                   // Handle submit button press
                   // You can add your submission logic here
                 },
-                child: Text('Submit'),
+                child: const Text('Submit'),
               ),
             ),
           ],
@@ -674,7 +699,6 @@ class DiaryWindow extends StatelessWidget {
   }
 }
 
-
 class DefaultWindow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -682,10 +706,10 @@ class DefaultWindow extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Default Window'),
       ),
-      body: Center(
+      body: const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
+          children: [
             Text('Default Window'),
             // Add more UI elements for the default window
           ],
