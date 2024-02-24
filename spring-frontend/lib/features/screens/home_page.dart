@@ -196,7 +196,7 @@ class _HomePageState extends State<HomePage> {
 }
 
 class SleepTrackingWindow extends StatefulWidget {
-  const SleepTrackingWindow({super.key});
+  const SleepTrackingWindow({Key? key}) : super(key: key);
 
   static const String routeName = '/sleeptrackingpage';
 
@@ -325,29 +325,23 @@ class _SleepTrackingWindowState extends State<SleepTrackingWindow> {
         ),
         const SizedBox(height: 10),
         SizedBox(
-          height: 200,
-          child: LineChart(
-            LineChartData(
-              lineBarsData: [
-                LineChartBarData(
-                  spots: _generateSpots(),
-                  isCurved: true,
-                  colors: [Colors.blue],
-                  barWidth: 4,
-                  belowBarData: BarAreaData(show: false),
-                ),
-              ],
+          height: 400,
+          child: BarChart(
+            BarChartData(
+              barGroups: _generateBarGroups(),
               titlesData: FlTitlesData(
                 leftTitles: SideTitles(showTitles: true),
                 bottomTitles: SideTitles(showTitles: true),
               ),
               borderData: FlBorderData(show: true),
-              minX: 0,
-              maxX: _sleepData.length.toDouble() - 1,
-              minY: 0,
               maxY: 24,
             ),
           ),
+        ),
+        const SizedBox(height: 20),
+        Text(
+          _hoursSlept,
+          style: const TextStyle(fontSize: 18),
         ),
       ],
     );
@@ -443,21 +437,23 @@ class _SleepTrackingWindowState extends State<SleepTrackingWindow> {
     });
   }
 
-  List<FlSpot> _generateSpots() {
-    List<FlSpot> spots = [];
+  List<BarChartGroupData> _generateBarGroups() {
+    List<BarChartGroupData> barGroups = [];
     for (int i = 0; i < _sleepData.length; i++) {
-      spots.add(FlSpot(i.toDouble(), _sleepData[i]));
+      double y = _sleepData[i];
+      barGroups.add(BarChartGroupData(
+        x: i,
+        barsSpace: 4,
+        barRods: [
+          BarChartRodData(
+            y: y,
+            colors: [Colors.blue],
+          ),
+        ],
+      ));
     }
-    return spots;
+    return barGroups;
   }
-
-  // List<FlSpot> _generateWeeklySleepSpots() {
-  //   List<FlSpot> spots = [];
-  //   for (int i = 0; i < _weeklySleepDuration.length; i++) {
-  //     spots.add(FlSpot(i.toDouble(), _weeklySleepDuration[i]));
-  //   }
-  //   return spots;
-  // }
 }
 
 class MoodTrackingWindow extends StatefulWidget {
