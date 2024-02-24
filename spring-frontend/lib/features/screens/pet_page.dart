@@ -81,8 +81,57 @@ class _PetPageState extends State<PetPage> {
 
   @override
   void initState() {
+    checkdate();
     super.initState();
   }
+
+  void checkdate() {
+    final user = FirebaseAuth.instance.currentUser;
+    DateTime roundedDate = DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
+
+    if (user != null) {
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get()
+          .then((DocumentSnapshot documentSnapshot) {
+        if (documentSnapshot.exists) {
+          // Check if the 'date' field exists and is not equal to roundedDate
+          Map<String, dynamic> data = documentSnapshot.data() as Map<String, dynamic>;
+          if (!data.containsKey('date') || data['date'] == null || documentSnapshot.get('date') == null || documentSnapshot.get('date').toDate() != roundedDate) {
+            // Update the 'date' field and clear the 'tasks' collection
+            FirebaseFirestore.instance
+                .collection('users')
+                .doc(user.uid)
+                .set({'date': roundedDate}, SetOptions(merge: true))
+                .then((_) {
+                  FirebaseFirestore.instance
+                      .collection('users')
+                      .doc(user.uid)
+                      .collection('tasks')
+                      .get()
+                      .then((snapshot) {
+                    for (DocumentSnapshot ds in snapshot.docs) {
+                      ds.reference.delete();
+                    }
+                    print('Tasks deleted');
+                  });
+                });
+          }
+        } else {
+          // If the document does not exist, create it with the 'date' field
+          FirebaseFirestore.instance
+              .collection('users')
+              .doc(user.uid)
+              .set({'date': roundedDate}, SetOptions(merge: true))
+              .then((_) {
+                print('User document created with date');
+              });
+        }
+      });
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -160,27 +209,30 @@ class _PetPageState extends State<PetPage> {
                                     .doc(user!.uid)
                                     .collection('tasks')
                                     .doc('Play with your pet')
-                                    .set({'count': count + 1}, SetOptions(merge: true));
+                                    .set({'count': count + 1},
+                                        SetOptions(merge: true));
                                 FirebaseFirestore.instance
                                     .collection('users')
                                     .doc(user.uid)
                                     .collection('tasks')
                                     .doc('Play with your pet')
-                                    .set({'completed': false}, SetOptions(merge: true));
-                              }
-                              else{
+                                    .set({'completed': false},
+                                        SetOptions(merge: true));
+                              } else {
                                 FirebaseFirestore.instance
                                     .collection('users')
                                     .doc(user!.uid)
                                     .collection('tasks')
                                     .doc('Play with your pet')
-                                    .set({'completed': true}, SetOptions(merge: true));
+                                    .set({'completed': true},
+                                        SetOptions(merge: true));
                                 FirebaseFirestore.instance
                                     .collection('users')
                                     .doc(user.uid)
                                     .collection('tasks')
                                     .doc('Play with your pet')
-                                    .set({'count': count + 1}, SetOptions(merge: true));
+                                    .set({'count': count + 1},
+                                        SetOptions(merge: true));
                               }
                             });
                           });

@@ -16,7 +16,7 @@ class HobbyPage extends StatefulWidget {
 class _HobbyPageState extends State<HobbyPage> {
   @override
   Widget build(BuildContext context) {
-    final int _duration = 10;
+    final int _duration = 1800;
     final CountDownController _controller = CountDownController();
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
     final user = FirebaseAuth.instance.currentUser;

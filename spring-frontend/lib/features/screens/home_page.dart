@@ -3,13 +3,6 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:intl/intl.dart';
-//
-
-void main() {
-  runApp(const MaterialApp(
-    home: HomePage(),
-  ));
-}
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -210,13 +203,26 @@ class _SleepTrackingWindowState extends State<SleepTrackingWindow> {
   String _sleepQuality = '';
   String _hoursSlept = '';
   List<double> _sleepData = [];
+  final user = FirebaseAuth.instance.currentUser;
 
   // Sleep Goals
-  final TimeOfDay _targetBedtime =
-      const TimeOfDay(hour: 22, minute: 0); // Default target bedtime
-  final TimeOfDay _targetWakeupTime =
-      const TimeOfDay(hour: 7, minute: 0); // Default target wakeup time
+  String _targetBedtime = '10pm';
+  String _targetWakeupTime = '6am';
 
+  Future<void> fetchTargets(String userId) async {
+    final DocumentSnapshot documentSnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .get();
+        
+      final String targetBedtime = documentSnapshot.get('targetBedtime');
+      final String targetWakeupTime = documentSnapshot.get('targetWakeupTime');
+
+    setState(() {
+      _targetBedtime = targetBedtime;
+      _targetWakeupTime = targetWakeupTime;
+    });
+  }
   @override
   void initState() {
     super.initState();
@@ -236,7 +242,6 @@ class _SleepTrackingWindowState extends State<SleepTrackingWindow> {
         .limit(14)
         .get();
 
-    print(querySnapshot.docs.length); // Debugging: print the number of documents (should be  14 or less
     // Create a map to store sleep data with date as key
     Map<DateTime, double> sleepDataMap = {};
     for (var doc in querySnapshot.docs) {
@@ -308,8 +313,8 @@ class _SleepTrackingWindowState extends State<SleepTrackingWindow> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Target Bedtime: ${_formatTime(_targetBedtime)}'),
-        Text('Target Wakeup Time: ${_formatTime(_targetWakeupTime)}'),
+        Text('Target Bedtime: ${(_targetBedtime)}'),
+        Text('Target Wakeup Time: ${(_targetWakeupTime)}'),
       ],
     );
   }
@@ -558,7 +563,7 @@ class _MoodTrackingWindowState extends State<MoodTrackingWindow> {
                         return FlSpot(
                             entry.key.toDouble(), entry.value.toDouble());
                       }).toList(),
-                      isCurved: true,
+                      isCurved: false,
                       colors: [Colors.blue],
                       barWidth: 4,
                       isStrokeCapRound: true,
@@ -705,26 +710,6 @@ class DiaryWindow extends StatelessWidget {
                 child: const Text('Submit'),
               ),
             ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class DefaultWindow extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Default Window'),
-      ),
-      body: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('Default Window'),
-            // Add more UI elements for the default window
           ],
         ),
       ),

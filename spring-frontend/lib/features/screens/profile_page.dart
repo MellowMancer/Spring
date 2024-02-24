@@ -117,7 +117,13 @@ class _ProfilePageState extends State<ProfilePage> {
             TextButton(
               child: Text('OK'),
               onPressed: () {
-                // Implement your logic to set target bedtime and wakeup time
+                FirebaseFirestore.instance
+                    .collection('users')
+                    .doc(FirebaseAuth.instance.currentUser!.uid)
+                    .set({
+                  'targetBedtime': _targetBedtime,
+                  'targetWakeupTime': _targetWakeupTime,
+                }, SetOptions(merge: true));
                 Navigator.of(context).pop();
               },
             ),
@@ -169,10 +175,11 @@ class _ProfilePageState extends State<ProfilePage> {
                   title: "Edit Profile",
                   icon: Icons.edit,
                   textColor: colorScheme.primary,
+                  endIcon: false,
                   onPress: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => EditProfileScreen()),
+                      MaterialPageRoute(builder: (context) => UpdateProfileScreen()),
                     );
                   },
                 ),
@@ -184,6 +191,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   title: "Set Bedtime and Wakeup Time",
                   icon: Icons.access_time,
                   textColor: colorScheme.primary,
+                  endIcon: false,
                   onPress: _showSetTimeDialog,
                 ),
                 const SizedBox(height: 10),

@@ -34,6 +34,12 @@ class _KindnessPageState extends State<KindnessPage> {
         'event_2': kindness2Controller.text,
         'event_3': kindness3Controller.text,
       }, SetOptions(merge: true));
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .set({
+            'date': DateTime.now()
+          }, SetOptions(merge: true));
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Kindness Acts Saved!')),
       );

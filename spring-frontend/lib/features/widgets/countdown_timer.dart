@@ -111,6 +111,12 @@ class CountdownTimerState extends State<CountdownTimer> {
             .collection('tasks')
             .doc(widget.taskTitle)
             .set({'completed': true}, SetOptions(merge: true));
+        FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .set({
+            'date': DateTime.now()
+          }, SetOptions(merge: true));
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Daily Task Completed!')),
         );

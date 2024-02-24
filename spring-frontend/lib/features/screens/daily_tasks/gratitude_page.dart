@@ -35,6 +35,12 @@ class _GratitudePageState extends State<GratitudePage> {
         'event_2': gratitude2Controller.text,
         'event_3': gratitude3Controller.text,
       }, SetOptions(merge: true));
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .set({
+            'date': DateTime.now()
+          }, SetOptions(merge: true));
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Gratitudes saved!')),
       );
