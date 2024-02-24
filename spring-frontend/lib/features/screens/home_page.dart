@@ -209,14 +209,55 @@ class _SleepTrackingWindowState extends State<SleepTrackingWindow> {
   TimeOfDay _wakeupTime = TimeOfDay.now();
   String _sleepQuality = '';
   String _hoursSlept = '';
-  final List<double> _sleepData = [];
-  final List<String> _sleepNotes = [];
+  List<double> _sleepData = [];
 
   // Sleep Goals
   final TimeOfDay _targetBedtime =
       const TimeOfDay(hour: 22, minute: 0); // Default target bedtime
   final TimeOfDay _targetWakeupTime =
       const TimeOfDay(hour: 7, minute: 0); // Default target wakeup time
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchData();
+  }
+
+  Future<void> _fetchData() async {
+    final DateTime now = DateTime.now();
+    final DateTime sevenDaysAgo = now.subtract(const Duration(days:  14));
+    final user = FirebaseAuth.instance.currentUser;
+    final QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('sleep')
+        .where('date', isGreaterThanOrEqualTo: sevenDaysAgo)
+        .orderBy('date', descending: true)
+        .limit(14)
+        .get();
+
+    print(querySnapshot.docs.length); // Debugging: print the number of documents (should be  14 or less
+    // Create a map to store sleep data with date as key
+    Map<DateTime, double> sleepDataMap = {};
+    for (var doc in querySnapshot.docs) {
+      final DateTime date = doc['date'].toDate();
+      final DateTime roundedDate = DateTime(date.year, date.month, date.day);
+      // Explicitly convert 'hoursSlept' to double
+      sleepDataMap[roundedDate] = (doc['hoursSlept'] as int).toDouble();
+    }
+
+    // Generate a list of sleep hours for the past  14 days, filling with  0 if not present
+    List<double> sleepDataList = List.generate(14, (index) {
+      final DateTime date = DateTime.now().subtract(Duration(days: index));
+      final DateTime roundedDate = DateTime(date.year, date.month, date.day);
+      return sleepDataMap[roundedDate] ??  0.0; // Ensure the default value is a double
+    });
+
+    setState(() {
+      _sleepData = sleepDataList;
+    });
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -248,10 +289,6 @@ class _SleepTrackingWindowState extends State<SleepTrackingWindow> {
             _buildSectionTitle('Sleep Tips:'),
             _buildSleepTips(),
             const SizedBox(height: 20),
-
-            // Sleep Notes
-            // _buildSectionTitle('Sleep Notes:'),
-            // _buildSleepNotes(),
           ],
         ),
       ),
@@ -325,13 +362,13 @@ class _SleepTrackingWindowState extends State<SleepTrackingWindow> {
         ),
         const SizedBox(height: 10),
         SizedBox(
-          height: 200,
+          height: 400,
           child: LineChart(
             LineChartData(
               lineBarsData: [
                 LineChartBarData(
                   spots: _generateSpots(),
-                  isCurved: true,
+                  isCurved: false,
                   colors: [Colors.blue],
                   barWidth: 4,
                   belowBarData: BarAreaData(show: false),
@@ -378,34 +415,6 @@ class _SleepTrackingWindowState extends State<SleepTrackingWindow> {
     );
   }
 
-  Widget _buildSleepNotes() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        TextField(
-          decoration: InputDecoration(
-            hintText: 'Add notes about your sleep...',
-            border: OutlineInputBorder(),
-          ),
-          maxLines: null,
-          onChanged: (value) {
-            // Store sleep notes in a list
-            setState(() {
-              _sleepNotes.add(value);
-            });
-          },
-        ),
-        SizedBox(height: 10),
-        Text('Sleep Notes:', style: TextStyle(fontWeight: FontWeight.bold)),
-        SizedBox(height: 5),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: _sleepNotes.map((note) => Text('- $note')).toList(),
-        ),
-      ],
-    );
-  }
-
   Future<void> _selectTime(BuildContext context, bool isBedtime) async {
     final TimeOfDay? picked = await showTimePicker(
       context: context,
@@ -429,10 +438,23 @@ class _SleepTrackingWindowState extends State<SleepTrackingWindow> {
   void _calculateSleepQuality() {
     final bedtimeMinutes = _bedtime.hour * 60 + _bedtime.minute;
     final wakeupTimeMinutes = _wakeupTime.hour * 60 + _wakeupTime.minute;
-    final hoursSlept = ((wakeupTimeMinutes - bedtimeMinutes) / 60).round() + 24;
+    final hoursSlept = (wakeupTimeMinutes - bedtimeMinutes) >= 0
+        ? ((wakeupTimeMinutes - bedtimeMinutes) / 60).round()
+        : ((wakeupTimeMinutes - bedtimeMinutes) / 60).round() + 24;
+
+    final user = FirebaseAuth.instance.currentUser;
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(user!.uid)
+        .collection('sleep')
+        .doc('sleep${DateFormat('y-MM-dd').format(DateTime.now())}')
+        .set({
+      'hoursSlept': hoursSlept,
+      'date': DateTime.now(),
+    }, SetOptions(merge: true));
+    _fetchData(); // Update sleep data when sleep quality is calculated
 
     setState(() {
-      _sleepData.add(hoursSlept.toDouble());
       if (hoursSlept >= 7 && hoursSlept <= 9) {
         _sleepQuality = 'You slept well!';
       } else {
@@ -450,14 +472,6 @@ class _SleepTrackingWindowState extends State<SleepTrackingWindow> {
     }
     return spots;
   }
-
-  // List<FlSpot> _generateWeeklySleepSpots() {
-  //   List<FlSpot> spots = [];
-  //   for (int i = 0; i < _weeklySleepDuration.length; i++) {
-  //     spots.add(FlSpot(i.toDouble(), _weeklySleepDuration[i]));
-  //   }
-  //   return spots;
-  // }
 }
 
 class MoodTrackingWindow extends StatefulWidget {
@@ -499,7 +513,6 @@ class _MoodTrackingWindowState extends State<MoodTrackingWindow> {
       moodDataMap[roundedDate] = doc['mood'] as int;
       // print(moodDataMap[date]);
     }
-    
 
     // Generate a list of mood scores for the past  7 days, filling with  0 if not present
     List<int> moodDataList = List.generate(7, (index) {
