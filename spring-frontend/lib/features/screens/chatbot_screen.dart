@@ -71,7 +71,7 @@ class _ChatScreenState extends State<ChatScreen> {
     _messages.insert(0, message);
   });
   final response = await http.post(
-    Uri.parse('http://192.168.29.128:5000/responseMessage'),
+    Uri.parse('http://10.0.2.2:5000/responseMessage'),
     body: {
       'message': message.text,
     },

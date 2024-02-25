@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:spring/features/user_auth/login_page.dart';
 import 'package:spring/features/widgets/form_container_widget.dart';
 import 'package:spring/features/widgets/bottom_navigation_bar.dart';
-import 'package:spring/features/firebase_auth_implementation/firebase_auth_services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
@@ -23,7 +22,6 @@ class SignUpPage extends StatefulWidget {
 }
 
 class _SignUpPageState extends State<SignUpPage> {
-  // final FirebaseAuthServices _auth = FirebaseAuthServices();
   final GlobalKey<FormState> _signUpKey = GlobalKey<FormState>();
 
   TextEditingController nameController = TextEditingController();
