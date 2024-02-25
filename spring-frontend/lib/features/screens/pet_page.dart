@@ -98,7 +98,7 @@ class _PetPageState extends State<PetPage> {
         if (documentSnapshot.exists) {
           // Check if the 'date' field exists and is not equal to roundedDate
           Map<String, dynamic> data = documentSnapshot.data() as Map<String, dynamic>;
-          if (!data.containsKey('date') || data['date'] == null || documentSnapshot.get('date') == null || documentSnapshot.get('date').toDate() != roundedDate) {
+          if (!data.containsKey('date') || data['date'] == null || documentSnapshot.get('date') == null || DateTime(documentSnapshot.get('date').toDate().year, documentSnapshot.get('date').toDate().month, documentSnapshot.get('date').toDate().day)!= roundedDate) {
             // Update the 'date' field and clear the 'tasks' collection
             FirebaseFirestore.instance
                 .collection('users')
