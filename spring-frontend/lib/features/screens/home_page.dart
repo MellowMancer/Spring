@@ -492,6 +492,13 @@ class _MoodTrackingWindowState extends State<MoodTrackingWindow> {
   List<int> moodData = [];
   List<String> days = [];
 
+
+  final Map<int, String> moodLabels = {
+    0: '😔',
+    1: '😑',
+    2: '😄',
+  };
+
   @override
   void initState() {
     super.initState();
@@ -538,7 +545,7 @@ class _MoodTrackingWindowState extends State<MoodTrackingWindow> {
     });
   }
 
-  @override
+    @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -561,8 +568,7 @@ class _MoodTrackingWindowState extends State<MoodTrackingWindow> {
                   lineBarsData: [
                     LineChartBarData(
                       spots: moodData.asMap().entries.map((entry) {
-                        return FlSpot(
-                            entry.key.toDouble(), entry.value.toDouble());
+                        return FlSpot(entry.key.toDouble(), entry.value.toDouble());
                       }).toList(),
                       isCurved: false,
                       colors: [Colors.blue],
@@ -573,7 +579,15 @@ class _MoodTrackingWindowState extends State<MoodTrackingWindow> {
                   ],
                   minY: 0,
                   titlesData: FlTitlesData(
-                    leftTitles: SideTitles(showTitles: true),
+                    leftTitles: SideTitles(
+                      showTitles: true,
+                      getTitles: (value) {
+                        if (moodLabels.containsKey(value.toInt())) {
+                          return moodLabels[value.toInt()]!;
+                        }
+                        return '';
+                      },
+                    ),
                     bottomTitles: SideTitles(
                       showTitles: true,
                       getTitles: (value) {
