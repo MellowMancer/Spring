@@ -94,8 +94,8 @@ class _HomePageState extends State<HomePage> {
               Widget windowContent;
               switch (index) {
                 case 0:
-                  buttonText = 'Sleep Tracking';
-                  description = 'Track your sleep patterns';
+                  buttonText = 'Sleep Monitoring';
+                  description = 'Monitor your sleep patterns';
                   buttonIcon = Icons.bedtime;
                   windowContent = const SleepTrackingWindow();
                   break;
