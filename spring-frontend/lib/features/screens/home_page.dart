@@ -79,11 +79,11 @@ class _HomePageState extends State<HomePage> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 _buildMoodButton(
-                    0, Icons.sentiment_very_satisfied, 'Happy', colorScheme),
+                    0, Icons.sentiment_very_dissatisfied, 'Sad', colorScheme),
                 _buildMoodButton(
                     1, Icons.sentiment_neutral, 'Neutral', colorScheme),
                 _buildMoodButton(
-                    2, Icons.sentiment_very_dissatisfied, 'Sad', colorScheme),
+                    2, Icons.sentiment_very_satisfied, 'Happy', colorScheme),
               ],
             ),
             const SizedBox(height: 30),
@@ -109,13 +109,13 @@ class _HomePageState extends State<HomePage> {
                   buttonText = 'Diary';
                   description = 'Write your thoughts and experiences';
                   buttonIcon = Icons.book;
-                  windowContent = DiaryWindow();
+                  windowContent = const DiaryWindow();
                   break;
                 default:
                   buttonText = 'Button ${index + 1}';
                   description = 'Default button description';
                   buttonIcon = Icons.star;
-                  windowContent = DefaultWindow();
+                  windowContent = const DefaultWindow();
               }
               return SizedBox(
                 width: MediaQuery.of(context).size.width *
@@ -214,15 +214,16 @@ class _SleepTrackingWindowState extends State<SleepTrackingWindow> {
         .collection('users')
         .doc(user!.uid)
         .get();
-        
-      final String targetBedtime = documentSnapshot.get('targetBedtime');
-      final String targetWakeupTime = documentSnapshot.get('targetWakeupTime');
+
+    final String targetBedtime = documentSnapshot.get('targetBedtime');
+    final String targetWakeupTime = documentSnapshot.get('targetWakeupTime');
 
     setState(() {
       _targetBedtime = targetBedtime;
       _targetWakeupTime = targetWakeupTime;
     });
   }
+
   @override
   void initState() {
     super.initState();
@@ -231,7 +232,7 @@ class _SleepTrackingWindowState extends State<SleepTrackingWindow> {
 
   Future<void> _fetchData() async {
     final DateTime now = DateTime.now();
-    final DateTime sevenDaysAgo = now.subtract(const Duration(days:  14));
+    final DateTime sevenDaysAgo = now.subtract(const Duration(days: 14));
     final user = FirebaseAuth.instance.currentUser;
     final QuerySnapshot querySnapshot = await FirebaseFirestore.instance
         .collection('users')
@@ -255,14 +256,14 @@ class _SleepTrackingWindowState extends State<SleepTrackingWindow> {
     List<double> sleepDataList = List.generate(14, (index) {
       final DateTime date = DateTime.now().subtract(Duration(days: index));
       final DateTime roundedDate = DateTime(date.year, date.month, date.day);
-      return sleepDataMap[roundedDate] ??  0.0; // Ensure the default value is a double
+      return sleepDataMap[roundedDate] ??
+          0.0; // Ensure the default value is a double
     });
 
     setState(() {
       _sleepData = sleepDataList;
     });
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -652,16 +653,19 @@ class _MoodTrackingWindowState extends State<MoodTrackingWindow> {
 }
 
 class DiaryWindow extends StatelessWidget {
+  const DiaryWindow({super.key});
+
   @override
   Widget build(BuildContext context) {
     // Get today's date
     final DateTime now = DateTime.now();
     final DateFormat formatter = DateFormat('EEEE, MMMM d, yyyy');
     final String formattedDate = formatter.format(now);
+    final TextEditingController textFieldController = TextEditingController();
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Diary Entry'),
+        title: const Text('Diary'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -690,10 +694,11 @@ class DiaryWindow extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10.0),
                 ),
                 padding: const EdgeInsets.all(10.0),
-                child: const TextField(
+                child: TextField(
+                  controller: textFieldController,
                   maxLines: null,
                   expands: true,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     hintText: 'Write your thoughts here...',
                     border: InputBorder.none,
                   ),
@@ -704,13 +709,140 @@ class DiaryWindow extends StatelessWidget {
             Center(
               child: ElevatedButton(
                 onPressed: () {
-                  // Handle submit button press
-                  // You can add your submission logic here
+                  // Save diary entry to Firestore
+                  FirebaseFirestore.instance
+                      .collection('users')
+                      .doc(FirebaseAuth.instance.currentUser!.uid)
+                      .collection('diary')
+                      .doc(
+                          'diary${DateFormat('y-MM-dd').format(DateTime.now())}')
+                      .set({
+                    'content': textFieldController.text,
+                    'date': DateTime.now(),
+                  }, SetOptions(merge: true));
                 },
-                child: const Text('Submit'),
+                child: const Text('Save'),
+              ),
+            ),
+            //Create a button to view previous diary entries
+            const SizedBox(height: 20),
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  // Navigate to a new screen to view previous diary entries
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const DiaryEntriesScreen()),
+                  );
+                },
+                child: const Text('View Entire Diary'),
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class DiaryEntriesScreen extends StatefulWidget {
+  const DiaryEntriesScreen({Key? key}) : super(key: key);
+
+  @override
+  _DiaryEntriesScreenState createState() => _DiaryEntriesScreenState();
+}
+
+class _DiaryEntriesScreenState extends State<DiaryEntriesScreen> {
+  Map<String, bool> _isExpandedMap = {};
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Diary'),
+      ),
+      body: StreamBuilder<QuerySnapshot>(
+        stream: FirebaseFirestore.instance
+            .collection('users')
+            .doc(FirebaseAuth.instance.currentUser!.uid)
+            .collection('diary')
+            .snapshots(),
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.hasError) {
+            return Text('Something went wrong');
+          }
+
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          // Initialize _isExpandedMap with default values for each entry
+          if (snapshot.hasData && _isExpandedMap.isEmpty) {
+            for (var doc in snapshot.data!.docs) {
+              _isExpandedMap[doc.id] = false; // Set initial state to false (collapsed)
+            }
+          }
+
+          final entries = snapshot.data!.docs.map((doc) => doc.data() as Map<String, dynamic>).toList().reversed.toList();
+
+          return ListView.builder(
+            itemCount: entries.length,
+            itemBuilder: (context, index) {
+              final entryData = entries[index];
+              final date = DateFormat('y-MM-dd').format(entryData['date'].toDate());
+              final content = entryData['content'];
+              final entryId = snapshot.data!.docs[index].id;
+
+              return Card(
+                key: ValueKey(entryId), // Use the document ID as the key
+                child: Column(
+                  children: [
+                    ListTile(
+                      title: Text(
+                        content,
+                        maxLines:  null,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      subtitle: Text('Date: $date'),
+                      trailing: IconButton(
+                        icon: Icon(_isExpandedMap[entryId]! ? Icons.keyboard_arrow_down : Icons.keyboard_arrow_up),
+                        onPressed: () {
+                          setState(() {
+                            _isExpandedMap[entryId] = !_isExpandedMap[entryId]!;
+                          });
+                        },
+                      ),
+                    ),
+                    if (_isExpandedMap[entryId] == true)
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(content),
+                      ),
+                  ],
+                ),
+              );
+            },
+          );
+        },
+      ),
+    );
+  }
+}
+
+class DefaultWindow extends StatelessWidget {
+  const DefaultWindow({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Default Window'),
+      ),
+      body: const Center(
+        child: Text(
+          'This is the default window content.',
+          style: TextStyle(fontSize: 24),
         ),
       ),
     );

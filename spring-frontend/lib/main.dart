@@ -43,11 +43,11 @@ class MyApp extends StatelessWidget {
   MyApp({super.key, required this.settingsController});
 
   final SettingsController settingsController;
-  final ColorScheme colorScheme = ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 224, 132, 255));
+  final ColorScheme colorScheme = ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 224, 132, 255));
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
 
         // routes: {
         //   '/login': (context) => LoginPage(),
@@ -61,7 +61,6 @@ class MyApp extends StatelessWidget {
 
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
-        // home: LoginForm(),
         home: SplashScreen(child: LoginPage())
     );
   }

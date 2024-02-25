@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:circular_countdown_timer/circular_countdown_timer.dart';
 import 'package:spring/features/widgets/countdown_timer.dart';
-import 'dart:async';
 
 class ExercisePage extends StatefulWidget {
   const ExercisePage({super.key});
@@ -19,14 +18,8 @@ class _ExercisePageState extends State<ExercisePage> {
     final CountDownController controller = CountDownController();
     int currentStepIndex = 0;
     final ColorScheme colorScheme = Theme.of(context).colorScheme;
-    final List<String> exerciseSteps = [
-      'Step  1: Warm-up for 1-2 minutes by stretching and jogging in place',
-      'Step  2: Do 10 push-ups',
-      'Step  3: Perform 10 squats',
-      'Step  4: Do a plank for 30 seconds',
-      'Step  5: Rest for 1 minute',
-      'Step  6: Repeat steps 2-5 three times',
-    ];
+    const String exerciseSteps =
+      'Step  1: Warm-up for 1-2 minutes by stretching and jogging in place\nStep  2: Do 10 push-ups\nStep  3: Perform 10 squats\nStep  4: Do a plank for 30 seconds\nStep  5: Rest for 1 minute\nStep  6: Repeat steps 2-5 three times';
 
     return MaterialApp(
         theme: ThemeData.light(),
@@ -55,9 +48,9 @@ class _ExercisePageState extends State<ExercisePage> {
                         isVisible = !isVisible;
                       });
                     },
-                    child: Text(
-                      exerciseSteps[currentStepIndex],
-                      style: const TextStyle(fontSize: 16),
+                    child: const Text(
+                      exerciseSteps,
+                      style: TextStyle(fontSize: 16),
                     ),
                   ),
                   const SizedBox(height: 20),
