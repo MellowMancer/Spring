@@ -76,18 +76,6 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    // final colorScheme = ColorScheme.fromSwatch(primarySwatch: MaterialColor(0xFFA2E003, <int, Color>{
-    //       50: Color.fromARGB(255, 231, 255, 170),
-    //       100: Color(0xFFA2E003),
-    //       200: Color(0xFFA2E003),
-    //       300: Color(0xFFA2E003),
-    //       400: Color(0xFFA2E003),
-    //       500: Color(0xFFA2E003),
-    //       600: Color(0xFFA2E003),
-    //       700: Color(0xFFA2E003),
-    //       800: Color(0xFFA2E003),
-    //       900: Color(0xFFA2E003),
-    //     }));
     final colorScheme = ColorScheme.fromSeed(seedColor: Color.fromARGB(255, 255, 59, 85));
     return MaterialApp(
       theme:
