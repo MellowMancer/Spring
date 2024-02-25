@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:spring/features/firebase_auth_implementation/firebase_auth_functions.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:spring/features/widgets/bottom_navigation_bar.dart';
@@ -100,7 +99,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                 padding: const EdgeInsets.symmetric(horizontal: 32.0),
                 child: Center(
                   child: Text(
-                    'We have sent you a Email on  ${auth.currentUser?.email}',
+                    'We have sent you a Email on  ${FirebaseAuth.instance.currentUser?.email}',
                     textAlign: TextAlign.center,
                   ),
                 ),
