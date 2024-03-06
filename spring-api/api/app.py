@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, request, session
 from flask_cors import CORS, cross_origin
-import pyrebase
+# import pyrebase
 import chat_gemini
 
 # for firestore
