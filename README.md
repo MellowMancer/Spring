@@ -1,4 +1,8 @@
 # Spring
+## Description
+Spring is a comprehensive general well-being app for identifying and mitigating the risk of developing mental disorders/suicidal tendencies in people at an early stage, allowing users to take control of their mental well-being. Spring suggests various preventive measures for non-communicable diseases to ensure users a healthy life.
+
+## Setup
 ### Flask server setup
 #### Pre-requisites: Python
 ```
@@ -55,4 +59,3 @@
 ```
     flutter run
 ```
-*(This should get the project running, let me know if I missed anything)*
